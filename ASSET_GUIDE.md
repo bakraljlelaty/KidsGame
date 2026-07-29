@@ -22,7 +22,11 @@ remember to add them to the `assets:` section of `pubspec.yaml` when you start u
 | World-map tile icons (one per game) | `lib/shared/widgets/world_icon.dart` | `WorldIcon` / `_WorldIconPainter`, keyed by `GameId` |
 | Farm animals + foods (Feed the Animals) | `lib/features/feed_animals/animal_art.dart` | `AnimalArt` static paint methods (e.g. `paintFood`), used by the game's zones and draggables |
 | Feed the Animals scene background | `lib/features/feed_animals/feed_animals_game.dart` | `_FarmBackground` component |
-| Other mini-game scenes | `lib/features/bubble_pop/…`, `dancing_socks/…`, `muddy_pig/…`, `build_rocket/…`, `bedtime_routine/…` (`*_game.dart`) | Currently interim placeholder scenes drawn inline via `paintItem` callbacks on shared components; give each finished game its own `*_art.dart` (follow `animal_art.dart`) |
+| Bubbles, fish, underwater backdrop (Bubble Pop) | `lib/features/bubble_pop/bubble_art.dart` | `BubbleArt` painters keyed by `BubbleHue` |
+| Socks + bedroom (Dancing Socks) | `lib/features/dancing_socks/sock_art.dart` | `SockArt.paintSock` / `SockArt.paintBedroom`, styles in `SockStyles` |
+| Pig, bucket, towel, sponge (Muddy Pig Bath) | `lib/features/muddy_pig/pig_art.dart` | `PigArt` static paint methods |
+| Rocket parts, silhouettes, workshop (Build the Rocket) | `lib/features/build_rocket/rocket_art.dart` | `RocketArt` / `WorkshopArt`, parts keyed by `RocketPart` |
+| Bedroom, bed, lamp, teddy, window (Bedtime Routine) | `lib/features/bedtime_routine/bedtime_art.dart` | `BedtimeArt` static paint methods |
 | Mud blobs (swipe-clean) | `lib/shared/components/swipe_clean_layer.dart` | `SwipeCleanLayer` blob rendering |
 | Hint glow, sparkles, pulses | `lib/shared/components/gentle_effects.dart` | `GlowHighlight`, `SparkleBurst`, `GentleEffects` |
 | Sticker-book scenes (meadow / sky / sea) | `lib/features/sticker_book/sticker_book_screen.dart` | `_ScenePainter` |
