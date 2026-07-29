@@ -1,6 +1,8 @@
+<!-- Little Wonder World: no permissions are requested. The app is fully
+     offline; keep it that way (no INTERNET permission in this manifest). -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="little_wonder_world"
+        android:label="Little Wonder World"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
