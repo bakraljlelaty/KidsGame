@@ -61,7 +61,9 @@ class _MiniGameScreenState extends State<MiniGameScreen> {
     );
 
     _game = GameRegistry.of(widget.gameId).create(gameContext);
-    progress.recordGameStarted(widget.gameId);
+    // Deferred: recording notifies ProgressController listeners (the world
+    // map watches it), which must not happen while this route is building.
+    scheduleMicrotask(() => progress.recordGameStarted(widget.gameId));
   }
 
   void _onGameCompleted() {
