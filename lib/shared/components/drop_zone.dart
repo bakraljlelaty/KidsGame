@@ -30,8 +30,8 @@ class DropZone extends PositionComponent with HasGameReference<ToddlerGame> {
   final double snapRadius;
 
   /// Which items belong here. Defaults to matching [DraggableItem.itemId]
-  /// with [zoneId].
-  final bool Function(DraggableItem item)? acceptTest;
+  /// with [zoneId]. Mutable so subclasses can bind a test to `this`.
+  bool Function(DraggableItem item)? acceptTest;
 
   /// Called after an accepted item finished snapping into place.
   void Function(DraggableItem item)? onAccepted;
