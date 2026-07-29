@@ -27,6 +27,10 @@ class NoopGameAudio implements GameAudio {
 /// Central audio service: one looping music channel, one voice channel that
 /// never overlaps itself, and a small pool of effect players. Pauses with
 /// the app lifecycle and disposes cleanly.
+///
+/// Platform players are created lazily in [init]; when [init] is never
+/// called (unit/widget tests, or a device with broken audio) every call is
+/// a safe no-op.
 class AudioManager implements GameAudio {
   AudioManager();
 
@@ -35,11 +39,9 @@ class AudioManager implements GameAudio {
   static const double _voiceVolume = 1.0;
   static const int _effectPoolSize = 3;
 
-  final AudioPlayer _music = AudioPlayer(playerId: 'lww_music');
-  final AudioPlayer _voice = AudioPlayer(playerId: 'lww_voice');
-  final List<AudioPlayer> _effects = [
-    for (var i = 0; i < _effectPoolSize; i++) AudioPlayer(playerId: 'lww_fx$i'),
-  ];
+  AudioPlayer? _music;
+  AudioPlayer? _voice;
+  final List<AudioPlayer> _effects = [];
   int _nextEffect = 0;
 
   bool _musicEnabled = true;
@@ -50,15 +52,24 @@ class AudioManager implements GameAudio {
   MusicTrack? _currentTrack;
   bool _musicPausedByLifecycle = false;
   bool _disposed = false;
+  bool _initialized = false;
 
   Future<void> init() async {
+    if (_initialized || _disposed) return;
     try {
+      _music = AudioPlayer(playerId: 'lww_music');
+      _voice = AudioPlayer(playerId: 'lww_voice');
+      for (var i = 0; i < _effectPoolSize; i++) {
+        _effects.add(AudioPlayer(playerId: 'lww_fx$i'));
+      }
+      _initialized = true;
+
       await AudioPlayer.global.setAudioContext(
         AudioContextConfig(respectSilence: true).build(),
       );
-      await _music.setReleaseMode(ReleaseMode.loop);
-      await _music.setVolume(_musicVolume);
-      await _voice.setVolume(_voiceVolume);
+      await _music!.setReleaseMode(ReleaseMode.loop);
+      await _music!.setVolume(_musicVolume);
+      await _voice!.setVolume(_voiceVolume);
       for (final p in _effects) {
         await p.setVolume(_effectVolume);
         await p.setReleaseMode(ReleaseMode.stop);
@@ -72,6 +83,7 @@ class AudioManager implements GameAudio {
 
   /// Warms the asset cache for the small, frequently used files.
   Future<void> preload() async {
+    if (!_initialized) return;
     try {
       await AudioCache.instance.loadAll([
         for (final effect in SoundEffect.values) effect.assetPath,
@@ -88,30 +100,35 @@ class AudioManager implements GameAudio {
     _languageCode = settings.languageCode;
     final musicWasEnabled = _musicEnabled;
     _musicEnabled = settings.musicEnabled;
+    final music = _music;
+    if (music == null) return;
     if (!_musicEnabled) {
-      _safe(() => _music.pause());
+      _safe(() => music.pause());
     } else if (!musicWasEnabled && _currentTrack != null) {
-      _safe(() => _music.resume());
+      _safe(() => music.resume());
     }
   }
 
   Future<void> playMusic(MusicTrack track) async {
     _currentTrack = track;
-    if (!_musicEnabled || _disposed) return;
+    final music = _music;
+    if (!_musicEnabled || _disposed || music == null) return;
     await _safe(() async {
-      await _music.stop();
-      await _music.play(AssetSource(track.assetPath), volume: _musicVolume);
+      await music.stop();
+      await music.play(AssetSource(track.assetPath), volume: _musicVolume);
     });
   }
 
   Future<void> stopMusic() async {
     _currentTrack = null;
-    await _safe(() => _music.stop());
+    final music = _music;
+    if (music == null) return;
+    await _safe(() => music.stop());
   }
 
   @override
   Future<void> playEffect(SoundEffect effect) async {
-    if (!_effectsEnabled || _disposed) return;
+    if (!_effectsEnabled || _disposed || _effects.isEmpty) return;
     final player = _effects[_nextEffect];
     _nextEffect = (_nextEffect + 1) % _effects.length;
     await _safe(() async {
@@ -124,46 +141,57 @@ class AudioManager implements GameAudio {
   /// voices never overlap.
   @override
   Future<void> playInstruction(VoiceInstruction instruction) async {
-    if (!_voiceEnabled || _disposed) return;
+    final voice = _voice;
+    if (!_voiceEnabled || _disposed || voice == null) return;
     await _safe(() async {
-      await _voice.stop();
-      await _voice.play(
+      await voice.stop();
+      await voice.play(
         AssetSource(VoiceCatalog.assetPath(instruction, _languageCode)),
         volume: _voiceVolume,
       );
     });
   }
 
-  Future<void> stopVoice() => _safe(() => _voice.stop());
+  Future<void> stopVoice() async {
+    final voice = _voice;
+    if (voice == null) return;
+    await _safe(() => voice.stop());
+  }
 
   /// Call when the app goes to the background.
   Future<void> onAppPaused() async {
-    await _safe(() => _voice.stop());
-    if (_currentTrack != null && _musicEnabled) {
+    await stopVoice();
+    final music = _music;
+    if (music != null && _currentTrack != null && _musicEnabled) {
       _musicPausedByLifecycle = true;
-      await _safe(() => _music.pause());
+      await _safe(() => music.pause());
     }
   }
 
   /// Call when the app returns to the foreground.
   Future<void> onAppResumed() async {
-    if (_musicPausedByLifecycle && _musicEnabled && _currentTrack != null) {
-      await _safe(() => _music.resume());
+    final music = _music;
+    if (music != null &&
+        _musicPausedByLifecycle &&
+        _musicEnabled &&
+        _currentTrack != null) {
+      await _safe(() => music.resume());
     }
     _musicPausedByLifecycle = false;
   }
 
   Future<void> dispose() async {
     _disposed = true;
-    await _safe(() => _music.dispose());
-    await _safe(() => _voice.dispose());
+    final music = _music;
+    if (music != null) await _safe(() => music.dispose());
+    final voice = _voice;
+    if (voice != null) await _safe(() => voice.dispose());
     for (final p in _effects) {
       await _safe(() => p.dispose());
     }
   }
 
   Future<void> _safe(Future<void> Function() action) async {
-    if (_disposed) return;
     try {
       await action();
     } catch (e) {
