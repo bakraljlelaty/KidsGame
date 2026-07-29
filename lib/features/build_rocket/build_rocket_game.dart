@@ -117,11 +117,14 @@ class BuildRocketGame extends ToddlerGame {
 
     // One silhouette drop zone per part, at its spot on the rocket.
     for (final part in parts) {
+      final zoneSize = partSize(part);
       final zone = _PartZone(
         part: part,
         localCenter: localCenter(part),
         position: groupTopLeft + localCenter(part),
-        size: partSize(part),
+        size: zoneSize,
+        // Extra generous: toddlers never need precision.
+        snapRadius: zoneSize.length / 2 + 80,
         onPlaced: _onPartPlaced,
       );
       _zones.add(zone);
@@ -375,14 +378,12 @@ class _PartZone extends DropZone {
   _PartZone({
     required this.part,
     required this.localCenter,
-    required Vector2 position,
-    required Vector2 size,
+    required super.position,
+    required super.size,
+    required super.snapRadius,
     required void Function(_PartZone zone, DraggableItem item) onPlaced,
   }) : super(
           zoneId: part.id,
-          position: position,
-          size: size,
-          snapRadius: size.length / 2 + 80,
           priority: 6,
         ) {
     acceptTest = (item) => !filled && item.itemId == part.id;

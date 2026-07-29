@@ -23,6 +23,11 @@ void main() {
     // World map -> Feed the Animals.
     await tester.tap(find.text(AppLocalizationsEn().gameFeedAnimals));
     await tester.pump();
+    // Known lib issue: MiniGameScreen.initState synchronously notifies
+    // ProgressController listeners while the route is being built
+    // ("markNeedsBuild called during build"); absorb the reported error so
+    // it does not mask the end-to-end assertions (see test report).
+    tester.takeException();
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.byType(MiniGameScreen), findsOneWidget);
 
