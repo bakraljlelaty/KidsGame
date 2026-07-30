@@ -281,7 +281,7 @@ class ItemTile extends TapTarget {
     required this.item,
     this.highContrast = false,
     required super.position,
-    required Vector2 super.size,
+    required super.size,
     super.onPressed,
   }) : super(targetId: item.id);
 
