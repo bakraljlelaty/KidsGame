@@ -18,8 +18,10 @@ remember to add them to the `assets:` section of `pubspec.yaml` when you start u
 | Milo in Flame scenes | `lib/shared/characters/milo_component.dart` | `MiloComponent.render` calls `MiloPainter.paint` |
 | Milo in Flutter screens | `lib/shared/characters/milo_view.dart` | `MiloView` (ticker-driven `CustomPaint` on `MiloPainter`) |
 | Milo state list | `lib/shared/characters/milo_state.dart` | `MiloState` enum — maps 1:1 onto future sprite-sheet rows |
+| **Every academy content item** (color blobs, shapes, letter/number tiles, animals, foods, vehicles, toys) | `lib/shared/items/item_art.dart` | `ItemArt.paint(canvas, size, item, highContrast:)` — one switch on `ContentItem.artId` (see "The ItemArt catalog" below) |
+| Subject-room icons (one per concept area) | `lib/shared/widgets/subject_icon.dart` | `SubjectIcon` / `_SubjectIconPainter`, keyed by `Subject` — composes `ItemArt` drawings (and `MiloPainter` for Milo's World) |
 | Sticker art (all 18 collectible stickers) | `lib/shared/widgets/sticker_art.dart` | `StickerArtView` / `_StickerPainter`, keyed by the `StickerArt` enum (`lib/features/rewards/sticker_catalog.dart`) |
-| World-map tile icons (one per game) | `lib/shared/widgets/world_icon.dart` | `WorldIcon` / `_WorldIconPainter`, keyed by `GameId` |
+| World-map tile icons (one per bespoke game) | `lib/shared/widgets/world_icon.dart` | `WorldIcon` / `_WorldIconPainter`, keyed by `GameId` |
 | Farm animals + foods (Feed the Animals) | `lib/features/feed_animals/animal_art.dart` | `AnimalArt` static paint methods (e.g. `paintFood`), used by the game's zones and draggables |
 | Feed the Animals scene background | `lib/features/feed_animals/feed_animals_game.dart` | `_FarmBackground` component |
 | Bubbles, fish, underwater backdrop (Bubble Pop) | `lib/features/bubble_pop/bubble_art.dart` | `BubbleArt` painters keyed by `BubbleHue` |
@@ -32,6 +34,41 @@ remember to add them to the `assets:` section of `pubspec.yaml` when you start u
 | Sticker-book scenes (meadow / sky / sea) | `lib/features/sticker_book/sticker_book_screen.dart` | `_ScenePainter` |
 | Reward star badge | `lib/features/rewards/reward_overlay.dart` | `_StarBadge` |
 | Colour palette | `lib/core/theme/palette.dart` | `Palette` constants used by every painter |
+
+## The ItemArt catalog (academy content items)
+
+Every teachable item the activity engines show — a `ContentItem` from `ItemCatalog`
+(`lib/content/items/item_catalog.dart`) — is drawn by **one** class:
+`ItemArt` (`lib/shared/items/item_art.dart`). `ItemArt.paint` switches on
+`ContentItem.artId` (which defaults to the item's `id`), so all item drawing stays swappable
+for sprites later without touching any engine.
+
+- **Design box:** all item painters draw into a fixed **100 × 100** box scaled and centred to
+  the requested size; strokes are rounded and soften to ~50 % opacity (thicker + full opacity
+  under `highContrast`).
+- **Generic painters:** `'blob'` (a soft organic blob filled with `ContentItem.color` — the
+  colors pack) and `'glyph'` (a rounded tile in `ContentItem.color` showing
+  `ContentItem.glyph` — numbers, English letters, and Arabic letters all use it, so the whole
+  alphabet costs no extra art).
+- **Specific painters:** `shape_*` (circle, square, triangle, star, heart, rectangle, oval,
+  diamond), `animal_*` (rabbit, cow, monkey, duck, fish, cat, dog, bee, butterfly, ladybug),
+  `food_*` (apple, banana, strawberry, orange, pear, grapes, bread, milk, cheese, egg, carrot,
+  cookie), `vehicle_*` (car, bus, boat, rocket), `toy_*` (ball, block, teddy, drum, train).
+  Unknown ids fall back to the blob rather than crashing.
+
+**Adding an `artId`:**
+
+1. Add the `ContentItem` to its pack in `ItemCatalog` (omit `artId` to reuse the item `id`).
+2. Add a `case 'your_art_id':` to the switch in `ItemArt.paint`, drawing inside the 100 × 100
+   box with the provided `stroke` paint and `item.color`. Follow the art direction rules below.
+3. Nothing else — every engine (and `SubjectIcon`) picks the drawing up through the catalog.
+
+**Silhouette recipe (ShadowMatch):** silhouettes are *not* separate art. `_ShadowZone`
+(`lib/features/activities/shadow_match/shadow_match_game.dart`) renders the normal
+`ItemArt` drawing inside a `canvas.saveLayer`, then fills the bounds with a dark translucent
+color using `BlendMode.srcIn`, which masks the fill to the drawing's exact outline. Any new
+`artId` therefore gets a correct silhouette for free — keep item drawings a single filled
+silhouette-friendly form (no floating disconnected specks) so the shadow reads clearly.
 
 ## Replacing placeholder art with sprites later
 
@@ -54,10 +91,11 @@ touching callers — the widgets (`StickerArtView`, `WorldIcon`) keep their cons
 components using `paintItem` callbacks (`TapTarget`, `DraggableItem`), pass a sprite-drawing
 callback (or subclass and override `render`) instead of the procedural one.
 
-**Scaling contract.** Painters draw in a fixed design box (Milo: 100 × 120; stickers/icons:
-100 × 100) scaled to the requested size — author sprites with the same aspect ratios so positions
-and hit areas keep working. Interactive object sizes are multiplied by `StageConfig.itemScale`;
-never bake sizes into art assumptions.
+**Scaling contract.** Painters draw in a fixed design box (Milo: 100 × 120; stickers/icons and
+`ItemArt` items: 100 × 100) scaled to the requested size — author sprites with the same aspect
+ratios so positions and hit areas keep working. Interactive object sizes are multiplied by
+`BandConfig.itemScale` (activity engines) or `StageConfig.itemScale` (bespoke games); never
+bake sizes into art assumptions.
 
 ## Art direction rules
 

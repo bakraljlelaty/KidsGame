@@ -42,18 +42,40 @@ The file id is the enum name converted to snake_case: `feedRabbit` →
 code falls back to the first entry of `VoiceCatalog.supportedLanguages` (`en`). Display text for
 parents lives in the ARB files, deliberately **separate** from these audio ids.
 
-Current instruction ids (one WAV per id, per language):
+**The `VoiceInstruction` enum is the source of truth** for which clips exist —
+`tool/gen_audio.py` parses it directly, so the id families below describe the enum rather than
+duplicating it. There are currently **156 clips per language** (one WAV per id, per language;
+312 total for EN + AR).
+
+v1 families (bespoke games):
 
 | Group | Ids |
 |---|---|
 | General / Milo | `welcome`, `choose_game`, `great_job`, `well_done`, `try_again`, `sticker_earned`, `session_over`, `good_night` |
-| Counting | `count_one`, `count_two`, `count_three` |
+| Counting 1–3 | `count_one`, `count_two`, `count_three` |
 | Feed the Animals | `feed_intro`, `feed_rabbit`, `feed_cow`, `feed_monkey` |
 | Bubble Pop | `bubble_intro`, `pop_blue`, `pop_yellow`, `pop_red`, `pop_green`, `pop_fish`, `pop_star`, `pop_heart`, `pop_then_next` |
 | Dancing Socks | `socks_intro`, `socks_find` |
 | Muddy Pig Bath | `pig_intro`, `pig_scrub`, `pig_rinse`, `pig_dry`, `pig_clean` |
 | Build the Rocket | `rocket_intro`, `rocket_piece`, `rocket_launch` |
 | Bedtime Routine | `bedtime_intro`, `bedtime_toys`, `bedtime_teeth`, `bedtime_pajamas`, `bedtime_teddy`, `bedtime_light`, `bedtime_done` |
+
+Academy (v2) families — see the `// ---- Academy (v2) ----` section of the enum:
+
+| Group | Ids |
+|---|---|
+| Engine + navigation prompts | `find_it`, `sort_intro`, `sort_next`, `shadow_intro`, `shadow_next`, `memory_intro`, `memory_pair_found`, `pattern_intro`, `pattern_next`, `count_intro`, `give_me`, `trace_intro`, `trace_follow`, `unit_done`, `path_intro`, `rooms_intro`, `level_up` |
+| Colors | `color_red`, `color_blue`, `color_yellow`, `color_green`, `color_orange`, `color_purple`, `color_pink` |
+| Shapes | `shape_circle`, `shape_square`, `shape_triangle`, `shape_star`, `shape_heart`, `shape_rectangle`, `shape_oval`, `shape_diamond` |
+| Numbers 4–10 | `count_four` … `count_ten` (1–3 live in the v1 counting family) |
+| English letters | `letter_a` … `letter_z` (26 ids) |
+| Arabic letters | `ar_alif`, `ar_ba`, `ar_ta`, `ar_tha`, `ar_jim`, `ar_hha`, `ar_kha`, `ar_dal`, `ar_dhal`, `ar_ra`, `ar_zay`, `ar_sin`, `ar_shin`, `ar_sad`, `ar_dad`, `ar_tta`, `ar_zza`, `ar_ain`, `ar_ghain`, `ar_fa`, `ar_qaf`, `ar_kaf`, `ar_lam`, `ar_mim`, `ar_nun`, `ar_ha`, `ar_waw`, `ar_ya` (28 ids — both languages record all 156 ids, letters included) |
+| Item names: animals | `name_rabbit`, `name_cow`, `name_monkey`, `name_duck`, `name_fish`, `name_cat`, `name_dog`, `name_bee`, `name_butterfly`, `name_ladybug` |
+| Item names: food | `name_apple`, `name_banana`, `name_strawberry`, `name_orange`, `name_pear`, `name_grapes`, `name_bread`, `name_milk`, `name_cheese`, `name_egg`, `name_carrot`, `name_cookie` |
+
+Content items reference their name clip through `ContentItem.nameVoice`
+(`lib/content/items/content_item.dart`), so engines say "find the *red* one" by playing the
+item's own id — adding content usually means adding one name id per new item.
 
 ## Regenerating placeholder audio
 
@@ -64,7 +86,7 @@ python3 tool/gen_audio.py
 ```
 
 The script (re)writes every effect, both music loops, and one placeholder clip per
-`VoiceInstruction` per language. It **parses the enum straight out of
+`VoiceInstruction` per language (currently 156 × 2). It **parses the enum straight out of
 `lib/core/audio/voice_catalog.dart`**, so after adding instruction ids just rerun it and the new
 files exist — no list to maintain. Placeholder voice clips are distinct little tone patterns per
 id so testers can tell prompts apart; they are obviously not speech.

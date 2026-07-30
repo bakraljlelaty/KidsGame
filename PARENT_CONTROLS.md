@@ -20,32 +20,56 @@ then the new one twice). If you forget a changed PIN, the only reset is
 *Settings → Delete all child data* — which also erases progress — so pick something you'll
 remember.
 
+## How your child plays: the learning path and the play rooms
+
+From Milo's home screen your child has two big buttons:
+
+- **Learning path** (the large play-arrow button) — a guided journey through the six learning
+  areas: Colors, Shapes, Animals, Food, Numbers, Letters, and finally Milo's World. Each area
+  is a *unit* of small activity bubbles that open **in order**; the next one to play glows.
+  Nothing is timed and everything already finished can be replayed freely.
+- **Play rooms** (the grid button) — free play. One room per learning area; inside a room your
+  child can pick any activity in any order and replay favourites as often as they like. The
+  **Milo's World** room holds the six classic mini-games (feeding animals, bubbles, socks, the
+  muddy pig, the rocket, and the bedtime routine).
+
+Both ways of playing use the same activities and count toward the same progress — finishing an
+activity in a room also gently moves the learning path forward, so neither choice is "wrong".
+
+**Unit badges:** when every activity in a unit has been finished at least once, your child earns
+a small **trophy badge** shown on that unit's card (and a sticker celebration). Badges are
+participation awards — they mark that a unit was explored, never how "well" or how fast it went.
+
 ## The dashboard sections
 
 ### Profile
 
 - **Nickname** — a display nickname only; no real names are needed (or asked for).
-- **Age group** — "Around 2 years" or "Around 3 years". An approximate group only, never a
-  birth date.
 - **Avatar** — a small picture the child sees on their home screen.
-- **Language** — English or Arabic; changes both the app text and Milo's spoken voice.
-- **Development stage** — how the games behave:
-  - *Explorer*: one thing at a time, very large objects, quick help.
-  - *Helper*: tap and drag, two or three choices, simple matching, small puzzles.
-  - *Little Thinker*: up to five objects, four-piece puzzles, counting to three, little routines.
-- **Adjust stage automatically** — when on, the app moves up a stage gently after several
-  relaxed, hint-free play sessions. It is never based on speed, and you can always set the stage
-  yourself.
+- **Language** — English or Arabic; changes the app text, Milo's spoken voice, **and which
+  alphabet the Letters activities teach** (A–Z in English, ا–ي in Arabic).
+- **Age band** — the heart of difficulty tuning. Four bands (replacing the old three
+  "development stages"); every activity adapts its choices, counts, sizes, and patience to the
+  band:
+  - *Ages 2–3*: first discoveries — two big choices, lots of help, colours and shapes
+    (no letters yet).
+  - *Ages 3–4*: three choices, first letters, counting to five.
+  - *Ages 4–5*: four choices, patterns, counting to seven, first tracing.
+  - *Ages 5–6*: longer patterns, counting to ten, the full alphabet and finer tracing.
+  This is an approximate band only — never a birth date — and you can pick whichever band fits
+  your child regardless of their actual age.
+- **Adjust automatically** — when on, the app moves up gently after several relaxed, hint-free
+  play sessions. It is never based on speed, and you can always set the band yourself.
 
 ### Games
 
-- **Game access** — switch each of the six games on or off; only enabled games appear on the
-  child's world map.
+- **Game access** — switch each of the six Milo's World mini-games on or off; only enabled
+  games appear in the Milo's World room.
 - **Play order** —
-  - *Free choice*: your child picks any enabled game from the map.
+  - *Free choice*: your child picks any enabled game from the Milo's World map.
   - *Guided order*: games open one after another in a gentle sequence.
-- **Reset progress** — removes stars, stickers, and play history (after a confirmation). The
-  profile and your settings are kept.
+- **Reset progress** — removes stars, stickers, learning-path progress and badges, and play
+  history (after a confirmation). The profile and your settings are kept.
 
 ### Session
 
@@ -57,16 +81,17 @@ remember.
 - The section also shows roughly how long your child has played today.
 
 **How a session ends:** a soft sound plays about a minute before time is up. Your child may
-**always finish the mini-game they are playing** — the app never cuts an activity off. Afterwards
+**always finish the activity they are playing** — the app never cuts an activity off. Afterwards
 it returns to Milo, who is sleepy; the screen stays calm and quiet, and new sessions wait until
 the break passes, a new day starts, or you allow one. This gives the day a gentle, predictable
 ending instead of an abrupt stop.
 
 ### Progress
 
-A relaxed look at how your child likes to play: approximate play time, games tried and finished,
-how often hints appeared, which games are chosen most, which kinds of play came up (tapping,
-matching, colours, routines…), and the current stage.
+A relaxed look at how your child likes to play: approximate play time, activities and games
+tried and finished (**per learning area** — Colors, Shapes, Animals, Food, Numbers, Letters,
+Milo's World), how often hints appeared, which games are chosen most, which kinds of play came
+up (tapping, matching, colours, routines…), and the current age band.
 
 **What these numbers mean — and what they don't:** this is a *play overview, not an assessment*.
 The app never grades, scores, or ranks your child, and nothing here diagnoses or measures

@@ -2,10 +2,21 @@
 
 > Working title — the product name lives in `lib/config/app_config.dart` (`AppConfig.appName`).
 
-An **offline-first Android toddler game** (ages 2–3) built with **Flutter + Flame**. Six gentle
-mini-games guide the child through a small world with **Milo**, an original friendly animal
-character. A PIN-protected **parent dashboard** controls games, session time, and settings, in
-**English and Arabic**.
+An **offline-first early-learning academy for ages 2–6** built with **Flutter + Flame** (grown
+from the original six-game toddler MVP — see git history and [PLAN.md](PLAN.md)). Six concept
+areas — Colors, Shapes, Animals, Food, Numbers, and Letters — each offer **5–8 activities**
+instantiated from **seven reusable activity engines** (TapChoice, DragSort, ShadowMatch,
+MemoryPairs, PatternComplete, CountAndGive, TraceShape), plus **Milo's World**, home of the six
+bespoke v1 mini-games. Children play two ways:
+
+- a **guided learning path** — units of activity nodes that unlock in order, narrated by
+  **Milo**, the app's original friendly animal character, and
+- **free-play rooms** — one room per concept area where activities are freely replayable.
+
+Four parent-selectable **age bands (2–3, 3–4, 4–5, 5–6)** tune every activity's difficulty and
+content ceilings. The app ships in **English and Arabic**, including the **Arabic alphabet** as
+letters content. A PIN-protected **parent dashboard** controls the age band, games, session
+time, and settings.
 
 ## Child-safety principles (in brief)
 
@@ -17,21 +28,21 @@ character. A PIN-protected **parent dashboard** controls games, session time, an
   escalate softly (bounce back → repeat instruction → highlight → auto-assist) so nobody gets stuck.
 - **Session limits with a calm ending.** When time is up, the child finishes the current activity,
   then Milo gets sleepy and the app winds down.
-- **Minimal data.** A nickname and an approximate age group only — never real names, birth dates,
+- **Minimal data.** A nickname and an approximate age band only — never real names, birth dates,
   photos, or location. See [PRIVACY_CHECKLIST.md](PRIVACY_CHECKLIST.md).
 
 ## Documentation map
 
 | Document | Contents |
 |---|---|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Directory map, layering, data flow, persistence, stage system |
-| [ASSET_GUIDE.md](ASSET_GUIDE.md) | Placeholder art, painter locations, replacing art with sprites |
-| [AUDIO_GUIDE.md](AUDIO_GUIDE.md) | Audio channels, voice/effect/music file IDs, replacing placeholder audio |
-| [LOCALIZATION_GUIDE.md](LOCALIZATION_GUIDE.md) | gen-l10n workflow, Arabic RTL rules, adding a language |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Directory map, layering, data flow, persistence, the academy layer (engines × content packs, learning path, age bands) |
+| [ASSET_GUIDE.md](ASSET_GUIDE.md) | Placeholder art, painter locations (incl. the ItemArt catalog), replacing art with sprites |
+| [AUDIO_GUIDE.md](AUDIO_GUIDE.md) | Audio channels, voice/effect/music file IDs, academy voice families, replacing placeholder audio |
+| [LOCALIZATION_GUIDE.md](LOCALIZATION_GUIDE.md) | gen-l10n workflow, Arabic RTL rules, per-language letter packs, adding a language |
 | [PARENT_CONTROLS.md](PARENT_CONTROLS.md) | Parent-facing guide to the gate and every dashboard section |
 | [PRIVACY_CHECKLIST.md](PRIVACY_CHECKLIST.md) | What is (and is not) stored; pre-release legal review list |
 | [GOOGLE_PLAY_RELEASE_CHECKLIST.md](GOOGLE_PLAY_RELEASE_CHECKLIST.md) | Everything to do before publishing |
-| [TESTING_GUIDE.md](TESTING_GUIDE.md) | Running tests, test layout, testing a new mini-game |
+| [TESTING_GUIDE.md](TESTING_GUIDE.md) | Running tests, test layout, testing a new engine or mini-game |
 | [docs/TODDLER_USABILITY_CHECKLIST.md](docs/TODDLER_USABILITY_CHECKLIST.md) | Manual usability pass with a real device |
 
 ## Required software
@@ -132,18 +143,59 @@ artwork and recordings can replace them **without code changes**:
 - Art (painters, sprite swap points, art direction rules): [ASSET_GUIDE.md](ASSET_GUIDE.md)
 - Audio (file naming, regeneration, recording guidance): [AUDIO_GUIDE.md](AUDIO_GUIDE.md)
 
-## Adding another mini-game
+## Adding a new activity (existing engine, new content or combination)
+
+Most new play comes from combining an existing engine with content — no game code required:
+
+1. **Add content if needed.** New `ContentItem`s go into a pack in `ItemCatalog`
+   (`lib/content/items/item_catalog.dart`). If an item introduces a new `artId`, add its painter
+   case in `ItemArt` (`lib/shared/items/item_art.dart` — see
+   [ASSET_GUIDE.md](ASSET_GUIDE.md)).
+2. **Add `ActivitySpec`(s)** to the subject's list in
+   `lib/content/activity_definitions.dart`: a **stable `id`** (it is persisted in path
+   progress — never rename shipped ids), the `engine`, `subject`, `contentPack`, practised
+   `skills`, and optional `params` for engine modes / per-node difficulty overrides
+   (e.g. `{'oddOneOut': 1}`, `'rounds'`, `'pairs'`). The learning path and the subject's
+   play room pick the new activity up automatically.
+3. **Add voice ids** for any new spoken names/prompts in
+   `lib/core/audio/voice_catalog.dart` (`VoiceInstruction`), wire them into the
+   `ContentItem.nameVoice` fields, then regenerate placeholder audio:
+   `python3 tool/gen_audio.py` (the script parses the enum — no list to maintain).
+4. **Write tests** — at minimum extend `test/features/activity_definitions_test.dart`-style
+   checks and the engine's rule tests. See [TESTING_GUIDE.md](TESTING_GUIDE.md).
+
+## Adding a new activity engine
+
+1. **Create the engine** under `lib/features/activities/<your_engine>/` as a `ToddlerGame`
+   subclass. Follow **`TapChoiceGame`**
+   (`lib/features/activities/tap_choice/tap_choice_game.dart`) — it is the annotated reference
+   engine: resolve the content pool from `gameContext.spec` (via `ItemCatalog.pack` /
+   `ItemCatalog.lettersFor`), read every difficulty tunable from `gameContext.bandConfig`
+   (with `gameContext.param(...)` for per-spec overrides), implement `showHint`,
+   `repeatInstruction`, `highlightTarget`, and `autoAssist`, and call
+   `registerCorrectAction` / `handleWrongAttempt` / `completeGame` from interactions.
+2. **Add an `ActivityEngine` value** (with a stable `storageKey`) in
+   `lib/shared/game/activity_spec.dart` and **register the factory in `ActivityRegistry`**
+   (`lib/shared/game/activity_registry.dart`). `ActivityScreen` hosts it from there.
+3. **Add `VoiceInstruction` ids** for the engine's prompts and rerun
+   `python3 tool/gen_audio.py`.
+4. **Add specs that use the engine** in `lib/content/activity_definitions.dart` (see above) and
+   **write tests** for the engine's rules across all four `BandConfig`s.
+
+## Adding another bespoke mini-game (Milo's World)
+
+The v1 flow still applies for full custom games:
 
 1. **Create a feature directory** `lib/features/<your_game>/` with a `ToddlerGame` subclass
-   (see `lib/shared/game/toddler_game.dart`). Implement `showHint`, `repeatInstruction`,
-   `highlightTarget`, and `autoAssist`; call `registerCorrectAction` / `handleWrongAttempt` /
-   `completeGame` from your interactions. Read all difficulty tunables from `stage`
-   (`StageConfig`) — never hard-code counts or sizes.
+   (see `lib/shared/game/toddler_game.dart`). Read v1 tunables from `stage` (`StageConfig`) —
+   never hard-code counts or sizes.
 2. **Add a `GameId` value** in `lib/shared/models/game_id.dart` with a stable `storageKey`
    (never rename existing keys without a `DataMigrator` step).
 3. **Register it in `GameRegistry`** (`lib/shared/game/game_registry.dart`): id, practised
-   `Skill`s, localized title getter, and the game factory. The world map, parent game-access
-   settings, and `MiniGameScreen` all pick it up from there automatically.
+   `Skill`s, localized title getter, and the game factory. The Milo's World map, parent
+   game-access settings, and `MiniGameScreen` all pick it up from there automatically. To place
+   it on the learning path as well, add a `bespoke` `ActivitySpec` to
+   `ActivityDefinitions.milosWorld`.
 4. **Add `VoiceInstruction` ids** for the game's spoken prompts in
    `lib/core/audio/voice_catalog.dart`, then regenerate placeholder audio so files exist for every
    id in every language: `python3 tool/gen_audio.py`.

@@ -17,10 +17,21 @@ reward flow) rather than isolated units.
 | Location | Covers |
 |---|---|
 | `test/core/` | Infrastructure: `LocalStore` implementations, `JsonDocument` envelope + corrupt-data fallback, `DataMigrator` steps, `VoiceCatalog` id/path mapping, sound/music asset paths |
-| `test/features/` | Controller and rules logic per feature: `SessionController` phases/limits/breaks, `SettingsController` (PIN change/check, restore-defaults keeping the PIN), `ProgressController` neutral counting, `RewardsController` star/sticker awards, `GameAccess` (de)serialization, profile stage handling |
+| `test/features/` | Controller and rules logic per feature: `SessionController` phases/limits/breaks, `SettingsController` (PIN change/check, restore-defaults keeping the PIN), `ProgressController` neutral counting, `RewardsController` star/sticker awards, `GameAccess` (de)serialization, profile stage handling — plus the academy suite below |
 | `test/shared/` | The shared game framework: `ToddlerGame` hint countdown + escalation ladder, `resolveDrop` snapping, `StageConfig` values, Milo state transitions |
-| `test/widgets/` | Widget tests: parent corner gate + PIN screen, dashboard sections reacting to controllers, reward overlay, child home phases (ready/resting) |
-| `integration_test/` | On-device smoke: full bootstrap with real `SharedPreferences`, navigating home → map → a mini-game → completion → reward |
+| `test/widgets/` | Widget tests: parent corner gate + PIN screen, dashboard sections reacting to controllers, reward overlay, child home phases (ready/resting), and navigation through the v2 academy structure |
+| `integration_test/` | On-device smoke: full bootstrap with real `SharedPreferences`, navigating home → rooms → a game → completion → reward |
+
+### The academy (v2) test files
+
+| File | Covers |
+|---|---|
+| `test/features/age_band_test.dart` | `AgeBand` storage keys, `BandConfig` values per band, legacy-stage mapping in both directions |
+| `test/features/migration_v2_test.dart` | The `DataMigrator` 1 → 2 step: v1 `stage`/`ageGroup` profiles migrate to the right `band`, other documents survive untouched |
+| `test/features/activity_definitions_test.dart` | Catalog integrity: unique stable spec ids, valid content packs, per-band subject availability (`subjectsFor`), `byId` lookup |
+| `test/features/path_progress_test.dart` | `PathProgressController`: in-order unlock rules, `nextNode`, per-band node keys, unit-badge award, persistence across reload, reset |
+| `test/features/academy_rewards_progress_test.dart` | Subject-keyed rewards (`awardActivityCompletion`, subject stars, unit-completion stickers) and subject-keyed `ProgressData` recording |
+| `test/widgets/world_map_access_test.dart`, `test/widgets/smoke_complete_game_test.dart` | Widget tests that exercise the academy screens: home → play rooms → Milo's World, game-access gating, and a full completion pass through the v2 structure |
 
 Every layer was built for testability — use these seams instead of mocking frameworks:
 
@@ -32,7 +43,7 @@ Every layer was built for testability — use these seams instead of mocking fra
 - `SessionController` takes an injectable `clock` and, with `enableAutoTick: false`, is driven by
   calling `tick()` manually — no fake `Timer`s needed.
 
-## Testing a new mini-game
+## Testing a new activity engine or mini-game
 
 **1. Pure rules first (no widgets, no Flame mounting needed for most logic).** Construct the game
 with a hand-built `GameContext`:
@@ -43,7 +54,9 @@ var hints = 0;
 var completed = false;
 
 final game = MyNewGame(GameContext(
-  stageConfig: StageConfig.explorer,     // test each stage's values explicitly
+  stageConfig: StageConfig.explorer,     // v1 tuning (bespoke games)
+  bandConfig: BandConfig.twoToThree,     // academy tuning (engines) — test each band
+  spec: ActivityDefinitions.colors.first, // for engines: the ActivitySpec under test
   audio: audio,
   onHintShown: () => hints++,
   onCompleted: () => completed = true,
@@ -58,9 +71,11 @@ advance time deterministically — e.g. `update(stage.hintDelay.inSeconds + 0.1)
 `showHint` and report through `onHintShown`. Assert audio *ids*, never playback:
 `expect(audio.instructions, contains(VoiceInstruction.feedIntro))`.
 
-**2. Stage behaviour.** Run the same rules against `StageConfig.explorer` / `helper` /
-`littleThinker` and assert counts/sizes/hint delays come from the config — a game that
-hard-codes them is a bug (see ARCHITECTURE.md, "Stage system").
+**2. Band/stage behaviour.** For an activity engine, run the same rules against all four
+`BandConfig`s (`twoToThree` … `fiveToSix`) and assert counts/sizes/hint delays come from the
+config (plus `ActivitySpec.params` overrides via `GameContext.param`); for a bespoke game, do
+the same across `StageConfig.explorer` / `helper` / `littleThinker`. A game that hard-codes
+tunables is a bug (see ARCHITECTURE.md, "Age bands and BandConfig").
 
 **3. App-level wiring with `enableAutoTick: false`.** For anything touching session flow, build
 services in the test:
@@ -87,19 +102,24 @@ await tester.pump();                                  // build
 await tester.pump(const Duration(milliseconds: 400)); // let animations advance
 ```
 
-`ChildHomeScreen`, `SleepyScreen`, `RewardOverlay`, and `MiniGameScreen` all contain Milo — this
-rule applies to every test that shows them.
+`ChildHomeScreen`, `SleepyScreen`, `RewardOverlay`, `MiniGameScreen`, and `ActivityScreen` all
+contain Milo (or a running `GameWidget`) — this rule applies to every test that shows them,
+including navigation tests that pass through the learning path or play rooms.
 
-**5. Checklist for the new game's test file(s)**
+**5. Checklist for the new engine's / game's test file(s)**
 
 - [ ] Completes via its intended interactions; `onCompleted` fired once
-- [ ] Hint appears after `stage.hintDelay` idle and repeats; reported via `onHintShown`
+- [ ] Hint appears after the configured `hintDelay` idle and repeats; reported via `onHintShown`
 - [ ] Wrong-attempt ladder in order, no negative feedback beyond the soft bounce
 - [ ] Auto-assist guarantees the child can never be stuck
-- [ ] All three `StageConfig`s change counts/sizes as designed
+- [ ] All four `BandConfig`s (engines) / all three `StageConfig`s (bespoke games) change
+      counts/sizes as designed
 - [ ] Voice ids used exist in `VoiceInstruction` (and files regenerated via `tool/gen_audio.py`)
-- [ ] Registered in `GameRegistry` (title resolves for EN + AR, skills listed, world map shows it)
-- [ ] Stickers exist in `StickerCatalog` so the reward flow can award them
+- [ ] Engines: registered in `ActivityRegistry` and reachable through `ActivitySpec`s in
+      `ActivityDefinitions` (stable ids — `activity_definitions_test.dart` guards uniqueness)
+- [ ] Bespoke games: registered in `GameRegistry` (title resolves for EN + AR, skills listed,
+      the Milo's World map shows it) and stickers exist in `StickerCatalog` so the reward flow
+      can award them
 
 ## Manual testing
 

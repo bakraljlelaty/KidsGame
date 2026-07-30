@@ -66,6 +66,38 @@ the id to `assets/audio/voices/<lang>/<id>.wav` using the language from settings
 
 If a prompt's wording changes, re-record the WAVs; the enum id stays stable.
 
+## Letters are a per-language content pack (v2)
+
+The academy's letters subject teaches the **alphabet of the app language** — the English
+alphabet in English, the **Arabic alphabet (28 letters, ا through ي)** in Arabic. This is
+content, not translation:
+
+- `ItemCatalog` (`lib/content/items/item_catalog.dart`) ships two letter packs:
+  `letters_en` (A–Z) and `letters_ar` (`ar_alif` … `ar_ya`), each item carrying its glyph and
+  its own `VoiceInstruction` name clip (`letter_a` …, `ar_alif` …).
+- Letter `ActivitySpec`s in `lib/content/activity_definitions.dart` reference the *virtual*
+  pack name **`'letters'`**. Engines resolve it at runtime via
+  **`ItemCatalog.lettersFor(languageCode)`**, using `GameContext.languageCode` — `'ar'` returns
+  the Arabic pack, everything else currently falls back to English. Path progress and room
+  listings are unaffected by the language switch because the spec ids stay the same.
+- Letter tiles are drawn by the generic `'glyph'` painter in `ItemArt`, so Arabic letter forms
+  render exactly as the font shapes them — no per-letter art is needed.
+- Letter activities only appear in age bands where `BandConfig.lettersEnabled` is true
+  (every band except 2–3).
+
+## New l10n keys in v2 (subjects and bands)
+
+Parent-facing (and semantics) text for the academy lives in the ARB files like everything else.
+When touching these, remember every key must exist in **both** `app_en.arb` and `app_ar.arb`:
+
+- **Subjects:** `subjectColors`, `subjectShapes`, `subjectAnimals`, `subjectFood`,
+  `subjectNumbers`, `subjectLetters`, `subjectMilosWorld` — used by the play rooms, the parent
+  progress section, and room semantics labels.
+- **Age bands:** `profileBand`, `bandTwoThree` … `bandFiveSix` plus their
+  `band…Description` counterparts — used by the profile section's band selector.
+- **Child-area semantics:** `semanticsPath` ("Learning path") and `semanticsRooms`
+  ("Play rooms") for the two home buttons.
+
 ## Adding a language end-to-end
 
 Example: French (`fr`).
@@ -92,7 +124,11 @@ Example: French (`fr`).
 6. **Expose the choice to parents.** Add the language to the pickers (profile / settings
    sections under `lib/features/parent_dashboard/sections/`) with a native-name label
    (`languageFrench` key in all ARB files).
-7. **Verify:** run the app, switch to the new language, confirm parent UI text, correct layout
+7. **Decide on letters content.** `ItemCatalog.lettersFor` returns the English pack for any
+   non-Arabic language; to teach the new language's own alphabet, add a `letters_<code>` pack
+   in `lib/content/items/item_catalog.dart` (glyphs + per-letter `VoiceInstruction` ids) and
+   extend `lettersFor`.
+8. **Verify:** run the app, switch to the new language, confirm parent UI text, correct layout
    direction (RTL languages: parent screens flip, game scenes must not), and that every voice
    line plays from the new folder. Then run the relevant parts of
    [docs/TODDLER_USABILITY_CHECKLIST.md](docs/TODDLER_USABILITY_CHECKLIST.md) in that language.

@@ -6,7 +6,10 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/game/game_registry.dart';
 import '../../../shared/models/development_stage.dart';
 import '../../../shared/models/skill.dart';
+import '../../../shared/models/subject.dart';
+import '../../../shared/widgets/subject_icon.dart';
 import '../../../shared/widgets/world_icon.dart';
+import '../../learning_path/path_progress.dart';
 import '../../profiles/profile_controller.dart';
 import '../../progress/progress_controller.dart';
 
@@ -32,11 +35,28 @@ class ProgressSection extends StatelessWidget {
         Skill.patterns => l10n.skillPatterns,
       };
 
+  String _subjectName(AppLocalizations l10n, Subject subject) =>
+      switch (subject) {
+        Subject.colors => l10n.subjectColors,
+        Subject.shapes => l10n.subjectShapes,
+        Subject.animals => l10n.subjectAnimals,
+        Subject.food => l10n.subjectFood,
+        Subject.numbers => l10n.subjectNumbers,
+        Subject.letters => l10n.subjectLetters,
+        Subject.milosWorld => l10n.subjectMilosWorld,
+      };
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final progress = context.watch<ProgressController>().data;
     final profile = context.watch<ProfileController>().profile;
+    final pathData = context.watch<PathProgressController>().data;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final playedSubjects = [
+      for (final subject in Subject.values)
+        if (progress.ofSubject(subject).attempts > 0) subject,
+    ];
 
     final stageName = switch (profile.stage) {
       DevelopmentStage.explorer => l10n.stageExplorer,
@@ -92,9 +112,44 @@ class ProgressSection extends StatelessWidget {
                   title: Text(l10n.currentStageLabel),
                   trailing: Text(stageName),
                 ),
+                Semantics(
+                  label: l10n.progressTitle,
+                  child: ListTile(
+                    leading: const Icon(Icons.emoji_events_rounded),
+                    trailing: Text('${pathData.unitBadges.length}'),
+                  ),
+                ),
               ],
             ),
           ),
+          if (playedSubjects.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Card(
+              child: Column(
+                children: [
+                  for (final subject in playedSubjects)
+                    ListTile(
+                      leading: SubjectIcon(
+                        subject: subject,
+                        size: 40,
+                        languageCode: languageCode,
+                      ),
+                      title: Text(_subjectName(l10n, subject)),
+                      trailing: Text(
+                        '${progress.ofSubject(subject).attempts}'
+                        ' / '
+                        '${progress.ofSubject(subject).completions}',
+                        semanticsLabel:
+                            '${l10n.gamesAttempted}: '
+                            '${progress.ofSubject(subject).attempts}, '
+                            '${l10n.gamesCompleted}: '
+                            '${progress.ofSubject(subject).completions}',
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 8),
           Card(
             child: Padding(
