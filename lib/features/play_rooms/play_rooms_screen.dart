@@ -5,11 +5,13 @@ import '../../content/activity_definitions.dart';
 import '../../core/audio/audio_manager.dart';
 import '../../core/audio/voice_catalog.dart';
 import '../../core/navigation/app_navigation.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/theme/palette.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/game/activity_screen.dart';
 import '../../shared/game/activity_spec.dart';
 import '../../shared/models/subject.dart';
+import '../../shared/models/subject_style.dart';
 import '../../shared/widgets/subject_icon.dart';
 import '../profiles/profile_controller.dart';
 import '../settings/settings_controller.dart';
@@ -98,46 +100,11 @@ class _PlayRoomsScreenState extends State<PlayRoomsScreen> {
                           button: true,
                           child: GestureDetector(
                             onTap: () => _openRoom(subject),
-                            child: Container(
-                              width: 168,
-                              height: 148,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                borderRadius: BorderRadius.circular(30),
-                                border: Border.all(
-                                  color: settings.highContrast
-                                      ? Palette.outlineStrong
-                                      : Colors.white,
-                                  width: settings.highContrast ? 3 : 4,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Palette.outlineStrong
-                                        .withValues(alpha: 0.12),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SubjectIcon(
-                                    subject: subject,
-                                    size: 78,
-                                    languageCode: settings.languageCode,
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    _subjectName(l10n, subject),
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: Palette.textSoft,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            child: _RoomDoor(
+                              subject: subject,
+                              name: _subjectName(l10n, subject),
+                              languageCode: settings.languageCode,
+                              highContrast: settings.highContrast,
                             ),
                           ),
                         ),
@@ -242,7 +209,14 @@ class SubjectRoomScreen extends StatelessWidget {
                               width: 132,
                               height: 132,
                               decoration: BoxDecoration(
-                                color: Palette.butter,
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    subject.accentSoft,
+                                    subject.accent,
+                                  ],
+                                ),
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: settings.highContrast
@@ -250,11 +224,19 @@ class SubjectRoomScreen extends StatelessWidget {
                                       : Colors.white,
                                   width: settings.highContrast ? 3 : 5,
                                 ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: subject.accent
+                                        .withValues(alpha: 0.5),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
                               ),
                               child: Icon(
                                 _engineIcon(spec.engine),
-                                size: 52,
-                                color: Palette.textDark,
+                                size: 54,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -297,6 +279,90 @@ class SubjectRoomScreen extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// A subject room drawn as a friendly little house door: colored arched
+/// roof, white body with the subject icon, rounded name plate.
+class _RoomDoor extends StatelessWidget {
+  const _RoomDoor({
+    required this.subject,
+    required this.name,
+    required this.languageCode,
+    required this.highContrast,
+  });
+
+  final Subject subject;
+  final String name;
+  final String languageCode;
+  final bool highContrast;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = subject.accent;
+    return Container(
+      width: 170,
+      height: 160,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: highContrast ? Palette.outlineStrong : accent,
+          width: highContrast ? 3 : 3.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: 0.45),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Arched roof band.
+          Container(
+            height: 44,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [accent, subject.accentSoft],
+              ),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+            ),
+            child: Center(
+              child: Container(
+                width: 26,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: SubjectIcon(
+                subject: subject,
+                size: 66,
+                languageCode: languageCode,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              name,
+              style: AppTheme.childLabel.copyWith(fontSize: 14),
+            ),
+          ),
+        ],
       ),
     );
   }

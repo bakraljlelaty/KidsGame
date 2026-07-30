@@ -37,3 +37,13 @@ flutter:
     - assets/audio/voices/en/
     - assets/audio/voices/ar/
     - assets/config/
+
+  fonts:
+    - family: Baloo
+      fonts:
+        - asset: assets/fonts/Baloo2.ttf
+          weight: 600
+    - family: BalooArabic
+      fonts:
+        - asset: assets/fonts/BalooBhaijaan2.ttf
+          weight: 600

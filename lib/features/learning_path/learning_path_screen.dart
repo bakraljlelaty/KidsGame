@@ -9,6 +9,7 @@ import '../../core/theme/palette.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/game/activity_screen.dart';
 import '../../shared/game/activity_spec.dart';
+import '../../shared/models/subject_style.dart';
 import '../../shared/widgets/subject_icon.dart';
 import '../profiles/profile_controller.dart';
 import '../session_control/session_controller.dart';
@@ -175,45 +176,65 @@ class _UnitCard extends StatelessWidget {
     final progress = pathProgress.unitProgress(band, unit);
     final hasBadge = pathProgress.hasUnitBadge(unit);
 
+    final accent = unit.subject.accent;
     return Container(
       width: 250,
       margin: const EdgeInsets.symmetric(horizontal: 10),
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
+        color: Colors.white.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(32),
         border: Border.all(
-          color: highContrast
-              ? Palette.outlineStrong
-              : Colors.white,
-          width: highContrast ? 3 : 4,
+          color: highContrast ? Palette.outlineStrong : accent,
+          width: highContrast ? 3 : 3,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: 0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SubjectIcon(
-                  subject: unit.subject,
-                  size: 54,
-                  languageCode: languageCode),
-              if (hasBadge)
-                const Padding(
-                  padding: EdgeInsets.only(left: 6),
-                  child: Icon(Icons.emoji_events_rounded,
-                      color: Palette.starGold, size: 30),
-                ),
-            ],
+          // Colored subject header band.
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [accent, unit.subject.accentSoft],
+              ),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(29)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SubjectIcon(
+                    subject: unit.subject,
+                    size: 46,
+                    languageCode: languageCode),
+                if (hasBadge)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 6),
+                    child: Icon(Icons.emoji_events_rounded,
+                        color: Palette.starGold, size: 30),
+                  ),
+              ],
+            ),
           ),
-          const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 8,
-              backgroundColor: Palette.cream,
-              color: Palette.starGold,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 8,
+                backgroundColor: Palette.cream,
+                color: Palette.starGold,
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -222,11 +243,13 @@ class _UnitCard extends StatelessWidget {
               crossAxisCount: 3,
               mainAxisSpacing: 8,
               crossAxisSpacing: 8,
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 for (final node in unit.nodes)
                   _NodeBubble(
                     spec: node,
+                    accent: accent,
                     completed: pathProgress.isNodeCompleted(band, node),
                     unlocked: pathProgress.isNodeUnlocked(band, node),
                     isCurrent: node.id == nextNodeId,
@@ -245,6 +268,7 @@ class _UnitCard extends StatelessWidget {
 class _NodeBubble extends StatelessWidget {
   const _NodeBubble({
     required this.spec,
+    required this.accent,
     required this.completed,
     required this.unlocked,
     required this.isCurrent,
@@ -253,6 +277,7 @@ class _NodeBubble extends StatelessWidget {
   });
 
   final ActivitySpec spec;
+  final Color accent;
   final bool completed;
   final bool unlocked;
   final bool isCurrent;
@@ -282,9 +307,19 @@ class _NodeBubble extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           decoration: BoxDecoration(
-            color: playable
-                ? (completed ? Palette.mint : Palette.butter)
-                : Palette.disabled,
+            color: playable ? null : Palette.disabled,
+            gradient: playable
+                ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: completed
+                        ? const [Palette.mint, Color(0xFF9AD9B5)]
+                        : [
+                            Color.lerp(accent, Colors.white, 0.45)!,
+                            accent,
+                          ],
+                  )
+                : null,
             shape: BoxShape.circle,
             border: Border.all(
               color: isCurrent
@@ -294,6 +329,13 @@ class _NodeBubble extends StatelessWidget {
                       : Colors.white,
               width: isCurrent ? 5 : 3,
             ),
+            boxShadow: [
+              if (isCurrent)
+                BoxShadow(
+                  color: Palette.coral.withValues(alpha: 0.55),
+                  blurRadius: 12,
+                ),
+            ],
           ),
           child: Center(
             child: completed
@@ -301,9 +343,7 @@ class _NodeBubble extends StatelessWidget {
                     color: Palette.starGold, size: 34)
                 : Icon(
                     playable ? _engineIcon : Icons.cloud_rounded,
-                    color: playable
-                        ? Palette.textDark
-                        : Palette.textSoft,
+                    color: playable ? Colors.white : Palette.textSoft,
                     size: 30,
                   ),
           ),

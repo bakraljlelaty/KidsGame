@@ -53,13 +53,22 @@ class MiloPainter {
     canvas.translate(sway, bounce);
 
     final outline = Paint()
-      ..color = Palette.outlineStrong.withValues(alpha: 0.55)
+      ..color = Palette.outlineStrong.withValues(alpha: 0.42)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2
+      ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round;
     final bodyPaint = Paint()..color = Palette.miloBody;
     final earPaint = Paint()..color = Palette.miloEar;
     final bellyPaint = Paint()..color = Palette.miloBelly;
+
+    // Soft top-light shading gives the flat shapes gentle volume.
+    final bodyShaded = Paint()
+      ..shader = const RadialGradient(
+        center: Alignment(-0.35, -0.45),
+        radius: 1.25,
+        colors: [Color(0xFFFBD9B4), Palette.miloBody, Color(0xFFEBB183)],
+        stops: [0.0, 0.55, 1.0],
+      ).createShader(const Rect.fromLTWH(18, 36, 64, 68));
 
     // Tail: a soft curl behind the body.
     final tail = Path()
@@ -99,16 +108,20 @@ class MiloPainter {
     ear(34, -0.24 + earWiggle);
     ear(66, 0.24 - earWiggle);
 
-    // Body: one soft blob (head and tummy together).
+    // Body: one soft blob (head and tummy together), softly lit.
     final bodyRect = Rect.fromCenter(
         center: const Offset(50, 70), width: 64, height: 68);
-    canvas.drawOval(bodyRect, bodyPaint);
+    canvas.drawOval(bodyRect, bodyShaded);
     canvas.drawOval(bodyRect, outline);
 
-    // Belly.
+    // Belly with a faint inner glow.
     canvas.drawOval(
       Rect.fromCenter(center: const Offset(50, 84), width: 36, height: 30),
       bellyPaint,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(center: const Offset(46, 80), width: 18, height: 12),
+      Paint()..color = Colors.white.withValues(alpha: 0.35),
     );
 
     // Arms.
@@ -261,18 +274,28 @@ class MiloPainter {
         );
       }
     } else {
-      final size = state == MiloState.surprised ? 6.4 : 5.2;
-      canvas.drawCircle(leftEye, size, eyePaint);
-      canvas.drawCircle(rightEye, size, eyePaint);
-      final highlight = Paint()..color = Colors.white.withValues(alpha: 0.9);
-      canvas.drawCircle(leftEye.translate(-1.6, -1.6), 1.7, highlight);
-      canvas.drawCircle(rightEye.translate(-1.6, -1.6), 1.7, highlight);
+      final size = state == MiloState.surprised ? 6.8 : 5.6;
+      // Warm brown iris behind the dark pupil reads friendlier than
+      // plain black dots.
+      final iris = Paint()..color = const Color(0xFF6B4F3A);
+      canvas.drawCircle(leftEye, size, iris);
+      canvas.drawCircle(rightEye, size, iris);
+      canvas.drawCircle(leftEye, size * 0.62, eyePaint);
+      canvas.drawCircle(rightEye, size * 0.62, eyePaint);
+      final highlight = Paint()..color = Colors.white.withValues(alpha: 0.95);
+      final softLight = Paint()..color = Colors.white.withValues(alpha: 0.5);
+      canvas.drawCircle(leftEye.translate(-1.8, -1.8), 1.9, highlight);
+      canvas.drawCircle(rightEye.translate(-1.8, -1.8), 1.9, highlight);
+      canvas.drawCircle(leftEye.translate(1.4, 1.6), 0.9, softLight);
+      canvas.drawCircle(rightEye.translate(1.4, 1.6), 0.9, softLight);
     }
 
-    // Cheeks.
-    final cheek = Paint()..color = Palette.miloCheek.withValues(alpha: 0.5);
-    canvas.drawCircle(const Offset(32, 70), 4.6, cheek);
-    canvas.drawCircle(const Offset(68, 70), 4.6, cheek);
+    // Cheeks: blurred blush reads softer than hard circles.
+    final cheek = Paint()
+      ..color = Palette.miloCheek.withValues(alpha: 0.55)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.6);
+    canvas.drawCircle(const Offset(32, 70), 5.0, cheek);
+    canvas.drawCircle(const Offset(68, 70), 5.0, cheek);
 
     // Mouth.
     const mouthCenter = Offset(50, 74);

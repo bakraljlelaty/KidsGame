@@ -109,33 +109,10 @@ class _ChildHomeScreenState extends State<ChildHomeScreen> {
           ),
           child: Stack(
             children: [
-              // Soft sun.
-              Positioned(
-                top: 30,
-                right: 60,
-                child: Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Palette.butter.withValues(alpha: 0.9),
-                  ),
-                ),
-              ),
-              // Meadow.
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 90,
-                  decoration: const BoxDecoration(
-                    color: Palette.meadow,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(120),
-                    ),
-                  ),
-                ),
+              // Living meadow backdrop: drifting clouds, sun rays,
+              // layered hills, flowers, a wandering butterfly.
+              Positioned.fill(
+                child: _LivingMeadow(reducedMotion: settings.reducedMotion),
               ),
               Center(
                 child: Row(
@@ -251,4 +228,200 @@ class _ChildHomeScreenState extends State<ChildHomeScreen> {
       ),
     );
   }
+}
+
+/// Slow, calm scenery animation for the home screen. One 60-second loop:
+/// clouds drift across, sun rays breathe, a butterfly wanders. Under
+/// reduced motion everything renders as a single still frame.
+class _LivingMeadow extends StatefulWidget {
+  const _LivingMeadow({required this.reducedMotion});
+
+  final bool reducedMotion;
+
+  @override
+  State<_LivingMeadow> createState() => _LivingMeadowState();
+}
+
+class _LivingMeadowState extends State<_LivingMeadow>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 60),
+    );
+    if (!widget.reducedMotion) _controller.repeat();
+  }
+
+  @override
+  void didUpdateWidget(_LivingMeadow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.reducedMotion && _controller.isAnimating) {
+      _controller.stop();
+    } else if (!widget.reducedMotion && !_controller.isAnimating) {
+      _controller.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ExcludeSemantics(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) => CustomPaint(
+          painter: _MeadowPainter(t: _controller.value),
+        ),
+      ),
+    );
+  }
+}
+
+class _MeadowPainter extends CustomPainter {
+  _MeadowPainter({required this.t});
+
+  final double t;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final tau = t * 2 * 3.14159265;
+
+    // Sun with breathing halo and soft rays.
+    final sun = Offset(w * 0.86, h * 0.16);
+    final halo = 58 + 6 * _wave(tau, 3);
+    canvas.drawCircle(
+        sun, halo, Paint()..color = Palette.butter.withValues(alpha: 0.25));
+    for (var i = 0; i < 8; i++) {
+      final angle = i * 3.14159265 / 4 + tau * 0.5;
+      final rayStart = sun +
+          Offset(58 * _cosA(angle), 58 * _sinA(angle));
+      final rayEnd = sun +
+          Offset((72 + 4 * _wave(tau, 2)) * _cosA(angle),
+              (72 + 4 * _wave(tau, 2)) * _sinA(angle));
+      canvas.drawLine(
+        rayStart,
+        rayEnd,
+        Paint()
+          ..color = Palette.butter.withValues(alpha: 0.55)
+          ..strokeWidth = 6
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+    canvas.drawCircle(sun, 46, Paint()..color = Palette.butter);
+    canvas.drawCircle(
+        sun.translate(-12, -12), 14,
+        Paint()..color = Colors.white.withValues(alpha: 0.4));
+
+    // Drifting clouds (two layers, wrapping).
+    void cloud(double phase, double y, double scale, double alpha) {
+      final x = ((t * 0.6 + phase) % 1.2 - 0.1) * w;
+      final c = Offset(x, h * y);
+      final paint = Paint()..color = Colors.white.withValues(alpha: alpha);
+      canvas.drawOval(
+          Rect.fromCenter(center: c, width: 130 * scale, height: 48 * scale),
+          paint);
+      canvas.drawOval(
+          Rect.fromCenter(
+              center: c.translate(-42 * scale, 12 * scale),
+              width: 90 * scale,
+              height: 40 * scale),
+          paint);
+      canvas.drawOval(
+          Rect.fromCenter(
+              center: c.translate(44 * scale, 14 * scale),
+              width: 90 * scale,
+              height: 42 * scale),
+          paint);
+    }
+
+    cloud(0.0, 0.14, 1.0, 0.9);
+    cloud(0.45, 0.26, 0.7, 0.75);
+    cloud(0.8, 0.08, 0.55, 0.6);
+
+    // Layered hills.
+    canvas.drawOval(
+      Rect.fromLTWH(-w * 0.3, h * 0.78, w * 1.0, h * 0.5),
+      Paint()..color = Palette.softGreen.withValues(alpha: 0.55),
+    );
+    canvas.drawOval(
+      Rect.fromLTWH(w * 0.4, h * 0.82, w * 0.9, h * 0.5),
+      Paint()..color = Palette.softGreen.withValues(alpha: 0.7),
+    );
+    final meadow = Path()
+      ..moveTo(0, h)
+      ..lineTo(0, h * 0.9)
+      ..quadraticBezierTo(w * 0.5, h * 0.8, w, h * 0.9)
+      ..lineTo(w, h)
+      ..close();
+    canvas.drawPath(meadow, Paint()..color = Palette.meadow);
+
+    // Flowers along the meadow edge.
+    for (var i = 0; i < 7; i++) {
+      final fx = w * (0.08 + i * 0.14);
+      final fy = h * (0.9 - 0.012 * _wave(i.toDouble(), 1));
+      final sway = 2.5 * _wave(tau + i, 1);
+      final color = const [
+        Palette.softPink,
+        Palette.softYellow,
+        Palette.lavender,
+      ][i % 3];
+      for (var p = 0; p < 5; p++) {
+        final angle = p * 2 * 3.14159265 / 5 + sway * 0.05;
+        canvas.drawCircle(
+          Offset(fx + 7 * _cosA(angle) + sway, fy + 7 * _sinA(angle)),
+          4.5,
+          Paint()..color = color,
+        );
+      }
+      canvas.drawCircle(Offset(fx + sway, fy), 3.5,
+          Paint()..color = Palette.butter);
+    }
+
+    // A wandering butterfly on a lazy figure-eight.
+    final bx = w * (0.32 + 0.2 * _sinA(tau));
+    final by = h * (0.3 + 0.1 * _sinA(2 * tau));
+    final flap = _wave(tau * 30, 1).abs();
+    for (final side in const [-1.0, 1.0]) {
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(bx + side * 8 * (0.5 + 0.5 * flap), by),
+          width: 14 * (0.5 + 0.5 * flap),
+          height: 11,
+        ),
+        Paint()..color = Palette.softPink.withValues(alpha: 0.9),
+      );
+    }
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(bx, by), width: 4, height: 12),
+      Paint()..color = Palette.outlineStrong.withValues(alpha: 0.7),
+    );
+  }
+
+  static double _wave(double x, double periods) =>
+      _sinA(x * periods);
+
+  static double _sinA(double a) {
+    a = a % 6.283185307;
+    if (a > 3.14159265) a -= 6.283185307;
+    // Bhaskara approximation keeps this dependency-free and smooth.
+    final sign = a < 0 ? -1.0 : 1.0;
+    a = a.abs();
+    return sign * 16 * a * (3.14159265 - a) /
+        (49.348 - 4 * a * (3.14159265 - a));
+  }
+
+  static double _cosA(double a) => _sinA(a + 1.5707963);
+
+  @override
+  bool shouldRepaint(_MeadowPainter oldDelegate) => oldDelegate.t != t;
 }

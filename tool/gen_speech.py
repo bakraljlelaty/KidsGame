@@ -1,13 +1,24 @@
 #!/usr/bin/env python3
-"""Generates real spoken voice instructions with offline TTS (espeak-ng).
+"""Generates spoken voice instructions for both app languages.
 
-Output: assets/audio/voices/<en|ar>/<id>.ogg — one file per VoiceInstruction
-(OGG Vorbis keeps 158 clips per language to a few megabytes). The synthetic
-voice is a development stand-in with clear real words in both languages;
-replace with human recordings (same filenames, .ogg) for release — see
-AUDIO_GUIDE.md.
+Primary backend: Piper neural TTS (natural offline voices, generated once at
+build time — the app itself stays fully offline). Fallback backend:
+espeak-ng, used automatically when the Piper models are not present.
 
-Requires: espeak-ng and ffmpeg (apt install espeak-ng ffmpeg).
+Output: assets/audio/voices/<en|ar>/<id>.ogg (22050 Hz OGG Vorbis). Replace
+any clip with a human recording of the same name for release.
+
+Setup (once):
+    pip install piper-tts
+    mkdir -p tool/piper_models && cd tool/piper_models
+    # from https://huggingface.co/rhasspy/piper-voices :
+    #   ar/ar_JO/kareem/medium/ar_JO-kareem-medium.onnx (+ .onnx.json)
+    #   en/en_US/hfc_female/medium/en_US-hfc_female-medium.onnx (+ .onnx.json)
+    # (model dir override: PIPER_MODEL_DIR=/path python3 tool/gen_speech.py)
+
+Arabic strings are fully diacritized (مُشَكَّلة) — both Piper's Arabic model
+and espeak-ng pronounce vocalized text far more accurately.
+
 Run from the repo root:  python3 tool/gen_speech.py
 """
 
@@ -16,12 +27,24 @@ import re
 import subprocess
 import sys
 import tempfile
+import wave
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VOICES_DIR = os.path.join(ROOT, "assets", "audio", "voices")
+MODEL_DIR = os.environ.get(
+    "PIPER_MODEL_DIR", os.path.join(ROOT, "tool", "piper_models"))
 
-EN_VOICE = ["-v", "en-us+f3", "-s", "128", "-p", "66", "-a", "180"]
-AR_VOICE = ["-v", "ar+f3", "-s", "122", "-p", "62", "-a", "180"]
+PIPER_MODELS = {
+    "en": "en_US-hfc_female-medium.onnx",
+    "ar": "ar_JO-kareem-medium.onnx",
+}
+# Slightly slower than default so small children can follow.
+PIPER_LENGTH_SCALE = {"en": 1.08, "ar": 1.12}
+
+ESPEAK_VOICE = {
+    "en": ["-v", "en-us+f3", "-s", "128", "-p", "66", "-a", "180"],
+    "ar": ["-v", "ar+f3", "-s", "118", "-p", "62", "-a", "180"],
+}
 
 # ---------------------------------------------------------------- catalogs
 
@@ -122,117 +145,118 @@ EN = {
     "name_cookie": "The cookie!",
 }
 
+# Fully vocalized Modern Standard Arabic, warm and child-directed.
 AR = {
-    "welcome": "مرحباً! أنا ميلو! هيا نلعب معاً!",
-    "choose_game": "اختر لعبة! أيّها تحب؟",
-    "great_job": "أحسنت! لقد نجحت!",
-    "well_done": "رائع! كان هذا جميلاً جداً!",
-    "try_again": "همم، هيا نحاول مرة أخرى!",
-    "sticker_earned": "حصلت على ملصق جديد! يا سلام!",
-    "session_over": "انتهى وقت اللعب الآن. إلى اللقاء قريباً!",
-    "good_night": "تصبح على خير! نوماً هنيئاً!",
-    "feed_intro": "الحيوانات جائعة! هيا نطعمها!",
-    "feed_rabbit": "أعطِ الجزرة للأرنب!",
-    "feed_cow": "أعطِ العشب للبقرة!",
-    "feed_monkey": "أعطِ الموزة للقرد!",
-    "bubble_intro": "انظر إلى كل هذه الفقاعات!",
-    "pop_blue": "افرقع الفقاعة الزرقاء!",
-    "pop_yellow": "افرقع الفقاعة الصفراء!",
-    "pop_red": "افرقع الفقاعة الحمراء!",
-    "pop_green": "افرقع الفقاعة الخضراء!",
-    "pop_fish": "افرقع فقاعة السمكة!",
-    "pop_star": "افرقع فقاعة النجمة!",
-    "pop_heart": "افرقع فقاعة القلب!",
-    "pop_then_next": "والآن التالية!",
-    "socks_intro": "الجوارب أضاعت أصدقاءها!",
-    "socks_find": "جِد الجورب المطابق!",
-    "pig_intro": "يا إلهي، الخنزير مليء بالطين! هيا نغسله!",
-    "pig_scrub": "افرك الإسفنجة على الطين!",
-    "pig_rinse": "اضغط على الماء للشطف!",
-    "pig_dry": "جفف الخنزير بالمنشفة!",
-    "pig_clean": "نظيف تماماً! يا له من خنزير سعيد!",
-    "rocket_intro": "هيا نبني صاروخاً!",
-    "rocket_piece": "ضع القطعة على ظلها!",
-    "rocket_launch": "ثلاثة، اثنان، واحد، انطلق!",
-    "bedtime_intro": "اقترب وقت النوم. هيا نستعد!",
-    "bedtime_toys": "ضع اللعبة في السلة!",
-    "bedtime_teeth": "هيا ننظف أسناني!",
-    "bedtime_pajamas": "ساعدني في ارتداء البيجاما!",
-    "bedtime_teddy": "ضع الدبدوب في السرير!",
-    "bedtime_light": "أطفئ النور!",
-    "bedtime_done": "تصبح على خير! أحلاماً سعيدة!",
-    "find_it": "هل تستطيع أن تجده؟ اضغط عليه!",
-    "sort_intro": "هيا نرتب! ضع كل واحدة في سلتها!",
-    "sort_next": "رائع! وماذا عن هذه؟",
-    "shadow_intro": "لكل صديق ظل! طابق بينهما!",
-    "shadow_next": "نعم! جِد الظل التالي!",
-    "memory_intro": "اقلب البطاقات وجِد الأزواج!",
-    "memory_pair_found": "زوج متطابق! لقد وجدته!",
-    "pattern_intro": "انظر إلى النمط!",
-    "pattern_next": "ماذا يأتي بعد ذلك؟",
-    "count_intro": "هيا نعد معاً!",
-    "give_me": "هل تعطيني...",
-    "trace_intro": "هيا نرسم بإصبعك!",
-    "trace_follow": "اتبع الخط من النقطة!",
-    "unit_done": "أنهيت الوحدة كاملة! مذهل!",
-    "path_intro": "هذا مسار التعلم! اضغط على الدائرة المضيئة!",
-    "rooms_intro": "اختر غرفة لتلعب فيها!",
-    "level_up": "أنت تتحسن كثيراً!",
-    "paint_intro": "هيا نرسم! استخدم إصبعك!",
-    "paint_done": "يا لها من لوحة جميلة!",
-    "color_red": "أحمر!",
-    "color_blue": "أزرق!",
-    "color_yellow": "أصفر!",
-    "color_green": "أخضر!",
-    "color_orange": "برتقالي!",
-    "color_purple": "بنفسجي!",
-    "color_pink": "وردي!",
-    "shape_circle": "دائرة!",
-    "shape_square": "مربع!",
-    "shape_triangle": "مثلث!",
-    "shape_star": "نجمة!",
-    "shape_heart": "قلب!",
-    "shape_rectangle": "مستطيل!",
-    "shape_oval": "شكل بيضاوي!",
-    "shape_diamond": "معيّن!",
-    "name_rabbit": "الأرنب!",
-    "name_cow": "البقرة!",
-    "name_monkey": "القرد!",
-    "name_duck": "البطة!",
-    "name_fish": "السمكة!",
-    "name_cat": "القطة!",
-    "name_dog": "الكلب!",
-    "name_bee": "النحلة!",
-    "name_butterfly": "الفراشة!",
-    "name_ladybug": "الدعسوقة!",
-    "name_apple": "التفاحة!",
-    "name_banana": "الموزة!",
-    "name_strawberry": "الفراولة!",
-    "name_orange": "البرتقالة!",
-    "name_pear": "الكمثرى!",
-    "name_grapes": "العنب!",
-    "name_bread": "الخبز!",
-    "name_milk": "الحليب!",
-    "name_cheese": "الجبن!",
-    "name_egg": "البيضة!",
-    "name_carrot": "الجزرة!",
-    "name_cookie": "البسكويتة!",
+    "welcome": "أَهْلاً! أَنا مِيلُو! هَيَّا نَلْعَبُ مَعاً!",
+    "choose_game": "اِخْتَرْ لُعْبَةً! أَيُّها تُحِبُّ؟",
+    "great_job": "أَحْسَنْتَ! لَقَدْ نَجَحْتَ!",
+    "well_done": "رائِعٌ! كانَ هٰذا جَميلاً جِدّاً!",
+    "try_again": "هَيَّا نُحاوِلُ مَرَّةً أُخْرَى!",
+    "sticker_earned": "حَصَلْتَ عَلَى مُلْصَقٍ جَديدٍ! يا سَلامْ!",
+    "session_over": "اِنْتَهَى وَقْتُ اللَّعِبِ الآنَ. إِلَى اللِّقاءِ قَريباً!",
+    "good_night": "تُصْبِحُ عَلَى خَيْرٍ! نَوْماً هَنيئاً!",
+    "feed_intro": "الحَيَواناتُ جائِعَةٌ! هَيَّا نُطْعِمُها!",
+    "feed_rabbit": "أَعْطِ الجَزَرَةَ لِلأَرْنَبِ!",
+    "feed_cow": "أَعْطِ العُشْبَ لِلْبَقَرَةِ!",
+    "feed_monkey": "أَعْطِ المَوْزَةَ لِلْقِرْدِ!",
+    "bubble_intro": "اُنْظُرْ إِلَى كُلِّ هٰذِهِ الفُقَّاعاتِ!",
+    "pop_blue": "اِضْغَطْ عَلَى الفُقَّاعَةِ الزَّرْقاءِ!",
+    "pop_yellow": "اِضْغَطْ عَلَى الفُقَّاعَةِ الصَّفْراءِ!",
+    "pop_red": "اِضْغَطْ عَلَى الفُقَّاعَةِ الحَمْراءِ!",
+    "pop_green": "اِضْغَطْ عَلَى الفُقَّاعَةِ الخَضْراءِ!",
+    "pop_fish": "اِضْغَطْ عَلَى فُقَّاعَةِ السَّمَكَةِ!",
+    "pop_star": "اِضْغَطْ عَلَى فُقَّاعَةِ النَّجْمَةِ!",
+    "pop_heart": "اِضْغَطْ عَلَى فُقَّاعَةِ القَلْبِ!",
+    "pop_then_next": "وَالآنَ التّالِيَةُ!",
+    "socks_intro": "الجَوارِبُ أَضاعَتْ أَصْدِقاءَها!",
+    "socks_find": "جِدِ الجَوْرَبَ المُطابِقَ!",
+    "pig_intro": "يا إِلٰهي، الخِنْزيرُ مَلِيءٌ بِالطِّينِ! هَيَّا نَغْسِلُهُ!",
+    "pig_scrub": "اُفْرُكِ الإِسْفَنْجَةَ عَلَى الطِّينِ!",
+    "pig_rinse": "اِضْغَطْ عَلَى الماءِ لِلشَّطْفِ!",
+    "pig_dry": "جَفِّفِ الخِنْزيرَ بِالمِنْشَفَةِ!",
+    "pig_clean": "نَظيفٌ تَماماً! يا لَهُ مِنْ خِنْزيرٍ سَعيدٍ!",
+    "rocket_intro": "هَيَّا نَبْني صارُوخاً!",
+    "rocket_piece": "ضَعِ القِطْعَةَ عَلَى ظِلِّها!",
+    "rocket_launch": "ثَلاثَةٌ، اِثْنانِ، واحِدٌ، اِنْطَلِقْ!",
+    "bedtime_intro": "اِقْتَرَبَ وَقْتُ النَّوْمِ. هَيَّا نَسْتَعِدُّ!",
+    "bedtime_toys": "ضَعِ اللُّعْبَةَ في السَّلَّةِ!",
+    "bedtime_teeth": "هَيَّا نُنَظِّفُ أَسْناني!",
+    "bedtime_pajamas": "ساعِدْني في اِرْتِداءِ البيجاما!",
+    "bedtime_teddy": "ضَعِ الدُّبْدُوبَ في السَّريرِ!",
+    "bedtime_light": "أَطْفِئِ النُّورَ!",
+    "bedtime_done": "تُصْبِحُ عَلَى خَيْرٍ! أَحْلاماً سَعيدَةً!",
+    "find_it": "هَلْ تَجِدُهُ؟ اِضْغَطْ عَلَيْهِ!",
+    "sort_intro": "هَيَّا نُرَتِّبُ! ضَعْ كُلَّ واحِدَةٍ في سَلَّتِها!",
+    "sort_next": "رائِعٌ! وَماذا عَنْ هٰذِهِ؟",
+    "shadow_intro": "لِكُلِّ صَديقٍ ظِلٌّ! طابِقْ بَيْنَهُما!",
+    "shadow_next": "نَعَمْ! جِدِ الظِّلَّ التّالي!",
+    "memory_intro": "اِقْلِبِ البِطاقاتِ وَجِدِ الأَزْواجَ!",
+    "memory_pair_found": "زَوْجٌ مُتَطابِقٌ! لَقَدْ وَجَدْتَهُ!",
+    "pattern_intro": "اُنْظُرْ إِلَى النَّمَطِ!",
+    "pattern_next": "ماذا يَأْتي بَعْدَ ذٰلِكَ؟",
+    "count_intro": "هَيَّا نَعُدُّ مَعاً!",
+    "give_me": "هَلْ تُعْطيني...",
+    "trace_intro": "هَيَّا نَرْسُمُ بِإِصْبَعِكَ!",
+    "trace_follow": "اِتْبَعِ الخَطَّ مِنَ النُّقْطَةِ!",
+    "unit_done": "أَنْهَيْتَ الوَحْدَةَ كامِلَةً! مُذْهِلٌ!",
+    "path_intro": "هٰذا مَسارُ التَّعَلُّمِ! اِضْغَطْ عَلَى الدّائِرَةِ المُضيئَةِ!",
+    "rooms_intro": "اِخْتَرْ غُرْفَةً لِتَلْعَبَ فيها!",
+    "level_up": "أَنْتَ تَتَحَسَّنُ كَثيراً!",
+    "paint_intro": "هَيَّا نَرْسُمُ! اِسْتَخْدِمْ إِصْبَعَكَ!",
+    "paint_done": "يا لَها مِنْ لَوْحَةٍ جَميلَةٍ!",
+    "color_red": "أَحْمَرُ!",
+    "color_blue": "أَزْرَقُ!",
+    "color_yellow": "أَصْفَرُ!",
+    "color_green": "أَخْضَرُ!",
+    "color_orange": "بُرْتُقالِيٌّ!",
+    "color_purple": "بَنَفْسَجِيٌّ!",
+    "color_pink": "وَرْدِيٌّ!",
+    "shape_circle": "دائِرَةٌ!",
+    "shape_square": "مُرَبَّعٌ!",
+    "shape_triangle": "مُثَلَّثٌ!",
+    "shape_star": "نَجْمَةٌ!",
+    "shape_heart": "قَلْبٌ!",
+    "shape_rectangle": "مُسْتَطيلٌ!",
+    "shape_oval": "شَكْلٌ بَيْضاوِيٌّ!",
+    "shape_diamond": "مُعَيَّنٌ!",
+    "name_rabbit": "الأَرْنَبُ!",
+    "name_cow": "البَقَرَةُ!",
+    "name_monkey": "القِرْدُ!",
+    "name_duck": "البَطَّةُ!",
+    "name_fish": "السَّمَكَةُ!",
+    "name_cat": "القِطَّةُ!",
+    "name_dog": "الكَلْبُ!",
+    "name_bee": "النَّحْلَةُ!",
+    "name_butterfly": "الفَراشَةُ!",
+    "name_ladybug": "الدُّعْسُوقَةُ!",
+    "name_apple": "التُّفّاحَةُ!",
+    "name_banana": "المَوْزَةُ!",
+    "name_strawberry": "الفَراوِلَةُ!",
+    "name_orange": "البُرْتُقالَةُ!",
+    "name_pear": "الكُمَّثْرَى!",
+    "name_grapes": "العِنَبُ!",
+    "name_bread": "الخُبْزُ!",
+    "name_milk": "الحَليبُ!",
+    "name_cheese": "الجُبْنُ!",
+    "name_egg": "البَيْضَةُ!",
+    "name_carrot": "الجَزَرَةُ!",
+    "name_cookie": "البَسْكَويتَةُ!",
 }
 
 EN_NUMBERS = ["one", "two", "three", "four", "five",
               "six", "seven", "eight", "nine", "ten"]
-AR_NUMBERS = ["واحد", "اثنان", "ثلاثة", "أربعة", "خمسة",
-              "ستة", "سبعة", "ثمانية", "تسعة", "عشرة"]
+AR_NUMBERS = ["واحِدٌ", "اِثْنانِ", "ثَلاثَةٌ", "أَرْبَعَةٌ", "خَمْسَةٌ",
+              "سِتَّةٌ", "سَبْعَةٌ", "ثَمانِيَةٌ", "تِسْعَةٌ", "عَشَرَةٌ"]
 
-# Arabic letter names (28), in enum order ar_alif .. ar_ya.
 AR_LETTER_NAMES = {
-    "ar_alif": "ألِف", "ar_ba": "باء", "ar_ta": "تاء", "ar_tha": "ثاء",
-    "ar_jim": "جيم", "ar_hha": "حاء", "ar_kha": "خاء", "ar_dal": "دال",
-    "ar_dhal": "ذال", "ar_ra": "راء", "ar_zay": "زاي", "ar_sin": "سين",
-    "ar_shin": "شين", "ar_sad": "صاد", "ar_dad": "ضاد", "ar_tta": "طاء",
-    "ar_zza": "ظاء", "ar_ain": "عين", "ar_ghain": "غين", "ar_fa": "فاء",
-    "ar_qaf": "قاف", "ar_kaf": "كاف", "ar_lam": "لام", "ar_mim": "ميم",
-    "ar_nun": "نون", "ar_ha": "هاء", "ar_waw": "واو", "ar_ya": "ياء",
+    "ar_alif": "أَلِفْ", "ar_ba": "باءْ", "ar_ta": "تاءْ", "ar_tha": "ثاءْ",
+    "ar_jim": "جيمْ", "ar_hha": "حاءْ", "ar_kha": "خاءْ", "ar_dal": "دالْ",
+    "ar_dhal": "ذالْ", "ar_ra": "راءْ", "ar_zay": "زايْ", "ar_sin": "سينْ",
+    "ar_shin": "شينْ", "ar_sad": "صادْ", "ar_dad": "ضادْ", "ar_tta": "طاءْ",
+    "ar_zza": "ظاءْ", "ar_ain": "عَيْنْ", "ar_ghain": "غَيْنْ",
+    "ar_fa": "فاءْ", "ar_qaf": "قافْ", "ar_kaf": "كافْ", "ar_lam": "لامْ",
+    "ar_mim": "ميمْ", "ar_nun": "نونْ", "ar_ha": "هاءْ", "ar_waw": "واوْ",
+    "ar_ya": "ياءْ",
 }
 
 for i, (en_word, ar_word) in enumerate(zip(EN_NUMBERS, AR_NUMBERS), start=1):
@@ -242,14 +266,53 @@ for i, (en_word, ar_word) in enumerate(zip(EN_NUMBERS, AR_NUMBERS), start=1):
 for code in range(ord("a"), ord("z") + 1):
     letter = chr(code)
     EN[f"letter_{letter}"] = f"{letter.upper()}!"
-    # English letters keep their English name in the Arabic folder too:
-    # the letters pack is language-resolved, so these never play under AR,
-    # but the file must exist.
-    AR[f"letter_{letter}"] = None  # marker: synthesize with the EN voice
+    AR[f"letter_{letter}"] = None  # synthesized with the EN voice
 
 for file_id, name in AR_LETTER_NAMES.items():
     AR[file_id] = f"{name}!"
-    EN[file_id] = None  # synthesize with the AR voice (Arabic content)
+    EN[file_id] = None  # synthesized with the AR voice
+
+
+# ---------------------------------------------------------------- backends
+
+class PiperBackend:
+    def __init__(self):
+        from piper import PiperVoice  # noqa: import checked by caller
+        self.voices = {}
+        for lang, model in PIPER_MODELS.items():
+            path = os.path.join(MODEL_DIR, model)
+            if not os.path.exists(path):
+                raise FileNotFoundError(path)
+            self.voices[lang] = PiperVoice.load(path)
+
+    def synth_wav(self, lang, text, wav_path):
+        import piper
+        voice = self.voices[lang]
+        kwargs = {}
+        try:
+            syn_config = piper.SynthesisConfig(
+                length_scale=PIPER_LENGTH_SCALE[lang])
+            kwargs["syn_config"] = syn_config
+        except AttributeError:
+            pass
+        with wave.open(wav_path, "wb") as wav_file:
+            voice.synthesize_wav(text, wav_file, **kwargs)
+
+
+class EspeakBackend:
+    def synth_wav(self, lang, text, wav_path):
+        subprocess.run(
+            ["espeak-ng", *ESPEAK_VOICE[lang], "-w", wav_path, text],
+            check=True, capture_output=True,
+        )
+
+
+def to_ogg(wav_path, ogg_path):
+    subprocess.run(
+        ["ffmpeg", "-y", "-loglevel", "error", "-i", wav_path,
+         "-c:a", "libvorbis", "-q:a", "2", "-ar", "22050", ogg_path],
+        check=True, capture_output=True,
+    )
 
 
 def enum_ids():
@@ -263,43 +326,34 @@ def enum_ids():
             for n in names]
 
 
-def synthesize(text, voice_args, out_path):
-    with tempfile.NamedTemporaryFile(suffix=".wav") as tmp:
-        subprocess.run(
-            ["espeak-ng", *voice_args, "-w", tmp.name, text],
-            check=True, capture_output=True,
-        )
-        subprocess.run(
-            ["ffmpeg", "-y", "-loglevel", "error", "-i", tmp.name,
-             "-c:a", "libvorbis", "-q:a", "2", "-ar", "22050", out_path],
-            check=True, capture_output=True,
-        )
-
-
 def main():
     ids = enum_ids()
     missing = [i for i in ids if i not in EN or i not in AR]
     if missing:
         sys.exit(f"Missing speech text for: {missing}")
 
-    for lang, catalog, default_voice in (
-        ("en", EN, EN_VOICE),
-        ("ar", AR, AR_VOICE),
-    ):
+    try:
+        backend = PiperBackend()
+        print("backend: piper (neural)")
+    except Exception as e:  # noqa: BLE001 - fall back to espeak on any issue
+        print(f"backend: espeak-ng fallback ({e})")
+        backend = EspeakBackend()
+
+    for lang, catalog in (("en", EN), ("ar", AR)):
         out_dir = os.path.join(VOICES_DIR, lang)
         os.makedirs(out_dir, exist_ok=True)
         for file_id in ids:
             text = catalog[file_id]
+            # Cross-language content keeps its own voice.
+            voice_lang = lang
             if text is None:
-                # Cross-language content: AR letters always use the AR
-                # voice, EN letters always the EN voice.
                 if file_id.startswith("ar_"):
-                    text, voice = AR[file_id], AR_VOICE
+                    text, voice_lang = AR[file_id], "ar"
                 else:
-                    text, voice = EN[file_id], EN_VOICE
-            else:
-                voice = default_voice
-            synthesize(text, voice, os.path.join(out_dir, f"{file_id}.ogg"))
+                    text, voice_lang = EN[file_id], "en"
+            with tempfile.NamedTemporaryFile(suffix=".wav") as tmp:
+                backend.synth_wav(voice_lang, text, tmp.name)
+                to_ogg(tmp.name, os.path.join(out_dir, f"{file_id}.ogg"))
         print(f"voices {lang}: {len(ids)} spoken clips")
 
 
