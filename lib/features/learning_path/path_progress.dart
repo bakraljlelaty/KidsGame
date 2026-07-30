@@ -66,13 +66,18 @@ class PathProgressController extends ChangeNotifier {
 
   bool hasUnitBadge(PathUnit unit) => _data.unitBadges.contains(unit.id);
 
-  /// A node is playable when every node before it (across units, in path
-  /// order) is complete — or it is already complete (free replay).
+  /// A node is playable when every node before it INSIDE ITS OWN UNIT is
+  /// complete (or it is already complete — free replay). Every unit is
+  /// open from the start: a child is never locked out of a whole concept
+  /// area just because another one is unfinished.
   bool isNodeUnlocked(AgeBand band, ActivitySpec spec) {
     for (final unit in LearningPath.unitsFor(band)) {
+      var priorComplete = true;
       for (final node in unit.nodes) {
-        if (node.id == spec.id) return true;
-        if (!isNodeCompleted(band, node)) return false;
+        if (node.id == spec.id) {
+          return priorComplete || isNodeCompleted(band, spec);
+        }
+        if (!isNodeCompleted(band, node)) priorComplete = false;
       }
     }
     return false;

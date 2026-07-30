@@ -43,7 +43,8 @@ void main() {
     await tester.tap(find.text(l10n.tabSession));
     await tester.pumpAndSettle();
 
-    expect(services.session.config.sessionMinutes, 10); // default
+    // Default is no automatic timer; parents opt in from here.
+    expect(services.session.config.sessionMinutes, isNull);
 
     // '5 minutes' only occurs in the session-length row (daily limit offers
     // 20/30/45/60), so the finder is unambiguous.

@@ -68,6 +68,27 @@ class _ChildHomeScreenState extends State<ChildHomeScreen> {
     }
   }
 
+  void _showParentHelp(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        icon: const Icon(Icons.touch_app_rounded, size: 36),
+        title: Text(l10n.parentGateTitle),
+        content: Text(
+          l10n.parentGateInstruction,
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(l10n.confirm),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -193,6 +214,35 @@ class _ChildHomeScreenState extends State<ChildHomeScreen> {
                 semanticLabel: l10n.semanticsParentCorner,
                 onUnlocked: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(builder: (_) => const PinScreen()),
+                ),
+              ),
+              // Small visible "for grown-ups" helper: explains how the
+              // corner gate works. Tapping it never opens the dashboard
+              // itself — it only shows readable instructions.
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Semantics(
+                    label: l10n.parentGateTitle,
+                    button: true,
+                    child: GestureDetector(
+                      onTap: () => _showParentHelp(context),
+                      child: Container(
+                        width: 54,
+                        height: 54,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.45),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.supervisor_account_rounded,
+                          size: 26,
+                          color: Palette.textSoft.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

@@ -17,6 +17,7 @@ import '../../features/settings/settings_controller.dart';
 import '../../l10n/app_localizations.dart';
 import '../models/development_stage.dart';
 import '../models/game_id.dart';
+import '../widgets/exit_slider.dart';
 import 'game_context.dart';
 import 'game_registry.dart';
 import 'toddler_game.dart';
@@ -142,11 +143,11 @@ class _MiniGameScreenState extends State<MiniGameScreen> {
                     ? Alignment.topLeft
                     : Alignment.topRight,
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: _BackBubble(
+                  padding: const EdgeInsets.all(8),
+                  child: ExitSlider(
                     semanticLabel: l10n.semanticsBack,
                     highContrast: settings.highContrast,
-                    onPressed: () {
+                    onExit: () {
                       if (!_completed) Navigator.of(context).maybePop();
                     },
                   ),
@@ -160,44 +161,3 @@ class _MiniGameScreenState extends State<MiniGameScreen> {
   }
 }
 
-class _BackBubble extends StatelessWidget {
-  const _BackBubble({
-    required this.onPressed,
-    required this.semanticLabel,
-    this.highContrast = false,
-  });
-
-  final VoidCallback onPressed;
-  final String semanticLabel;
-  final bool highContrast;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      label: semanticLabel,
-      button: true,
-      child: GestureDetector(
-        onTap: onPressed,
-        child: Container(
-          width: 88,
-          height: 88,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.85),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: highContrast
-                  ? Palette.outlineStrong
-                  : Palette.outline.withValues(alpha: 0.4),
-              width: highContrast ? 3 : 2,
-            ),
-          ),
-          child: const Icon(
-            Icons.home_rounded,
-            size: 44,
-            color: Palette.textDark,
-          ),
-        ),
-      ),
-    );
-  }
-}

@@ -21,7 +21,9 @@ void main() {
 
       expect(controller.isNodeUnlocked(band, units[0].nodes[0]), isTrue);
       expect(controller.isNodeUnlocked(band, units[0].nodes[1]), isFalse);
-      expect(controller.isNodeUnlocked(band, units[1].nodes[0]), isFalse);
+      // Every unit is open from the start (nodes gate only within a unit).
+      expect(controller.isNodeUnlocked(band, units[1].nodes[0]), isTrue);
+      expect(controller.isNodeUnlocked(band, units[1].nodes[1]), isFalse);
       expect(controller.nextNode(band), same(units[0].nodes[0]));
     });
 

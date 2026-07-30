@@ -3,9 +3,12 @@ import '../../core/persistence/local_store.dart';
 
 /// Parent-chosen session timing rules.
 class SessionConfig {
+  /// Defaults: no automatic limits. Parents opt in from the dashboard —
+  /// an unexplained lock-out ("why are there no games?") is worse for
+  /// trust than unlimited play out of the box.
   const SessionConfig({
-    this.sessionMinutes = 10,
-    this.dailyLimitMinutes = 30,
+    this.sessionMinutes,
+    this.dailyLimitMinutes,
     this.breakMinutes = 30,
   });
 

@@ -1,5 +1,6 @@
 import '../../features/activities/count_and_give/count_and_give_game.dart';
 import '../../features/activities/drag_sort/drag_sort_game.dart';
+import '../../features/activities/free_paint/free_paint_game.dart';
 import '../../features/activities/memory_pairs/memory_pairs_game.dart';
 import '../../features/activities/pattern_complete/pattern_complete_game.dart';
 import '../../features/activities/shadow_match/shadow_match_game.dart';
@@ -23,6 +24,7 @@ class ActivityRegistry {
         ActivityEngine.patternComplete => PatternCompleteGame(context),
         ActivityEngine.countAndGive => CountAndGiveGame(context),
         ActivityEngine.traceShape => TraceShapeGame(context),
+        ActivityEngine.freePaint => FreePaintGame(context),
         ActivityEngine.bespoke =>
           GameRegistry.of(spec.bespokeGame!).create(context),
       };

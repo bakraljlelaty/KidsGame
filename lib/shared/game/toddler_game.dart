@@ -156,6 +156,11 @@ abstract class ToddlerGame extends FlameGame {
   @protected
   void autoAssist();
 
+  /// Test hook: the stress-test suite drives every activity to completion
+  /// through the same assistance path a stuck child would get.
+  @visibleForTesting
+  void assistForTesting() => autoAssist();
+
   /// Call after every successful step: resets the escalation ladder and the
   /// hint countdown.
   void registerCorrectAction() {

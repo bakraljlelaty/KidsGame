@@ -85,6 +85,32 @@ class _SubjectIconPainter extends CustomPainter {
                 id: 'l', artId: 'glyph',
                 glyph: languageCode == 'ar' ? 'أ ب' : 'A B',
                 color: Palette.softPurple));
+      case Subject.art:
+        // A painter's palette: three paint dots on a soft board.
+        canvas.drawOval(
+          Rect.fromLTWH(size.width * 0.08, size.height * 0.18,
+              size.width * 0.84, size.height * 0.68),
+          Paint()..color = Palette.peach,
+        );
+        canvas.drawOval(
+          Rect.fromLTWH(size.width * 0.08, size.height * 0.18,
+              size.width * 0.84, size.height * 0.68),
+          Paint()
+            ..color = Palette.outlineStrong.withValues(alpha: 0.4)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2.5,
+        );
+        for (final (dx, dy, color) in [
+          (0.3, 0.4, Palette.softRed),
+          (0.55, 0.32, Palette.softBlue),
+          (0.66, 0.58, Palette.softGreen),
+        ]) {
+          canvas.drawCircle(
+            Offset(size.width * dx, size.height * dy),
+            size.width * 0.1,
+            Paint()..color = color,
+          );
+        }
       case Subject.milosWorld:
         MiloPainter.paint(canvas, size,
             state: MiloState.happy, time: 0.4, reducedMotion: true);

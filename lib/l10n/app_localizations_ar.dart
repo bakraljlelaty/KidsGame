@@ -57,6 +57,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get subjectLetters => 'الحروف';
 
   @override
+  String get subjectArt => 'الرسم';
+
+  @override
   String get subjectMilosWorld => 'عالم ميلو';
 
   @override

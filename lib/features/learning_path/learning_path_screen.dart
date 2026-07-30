@@ -267,6 +267,7 @@ class _NodeBubble extends StatelessWidget {
         ActivityEngine.patternComplete => Icons.more_horiz_rounded,
         ActivityEngine.countAndGive => Icons.exposure_plus_1_rounded,
         ActivityEngine.traceShape => Icons.gesture_rounded,
+        ActivityEngine.freePaint => Icons.brush_rounded,
         ActivityEngine.bespoke => Icons.sports_esports_rounded,
       };
 

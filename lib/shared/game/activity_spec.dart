@@ -11,6 +11,7 @@ enum ActivityEngine {
   patternComplete('pattern_complete'),
   countAndGive('count_and_give'),
   traceShape('trace_shape'),
+  freePaint('free_paint'),
   bespoke('bespoke');
 
   const ActivityEngine(this.storageKey);

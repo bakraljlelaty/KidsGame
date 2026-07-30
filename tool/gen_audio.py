@@ -9,6 +9,7 @@ Run from the repo root:  python3 tool/gen_audio.py
 """
 
 import math
+import sys
 import os
 import re
 import struct
@@ -189,12 +190,15 @@ def main():
               music_lullaby())
     print("music   calm_loop, lullaby_loop")
 
-    for lang in ("en", "ar"):
-        for file_id in voice_instruction_ids():
-            write_wav(os.path.join(AUDIO, "voices", lang,
-                                   f"{file_id}.wav"),
-                      voice_placeholder(file_id, lang))
-        print(f"voices  {lang}: done")
+    # Spoken voice clips come from tool/gen_speech.py (real TTS words).
+    # Pass --chimes to regenerate the old tonal placeholders instead.
+    if "--chimes" in sys.argv:
+        for lang in ("en", "ar"):
+            for file_id in voice_instruction_ids():
+                write_wav(os.path.join(AUDIO, "voices", lang,
+                                       f"{file_id}.wav"),
+                          voice_placeholder(file_id, lang))
+            print(f"voices  {lang}: done (chime placeholders)")
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ import '../../features/session_control/session_controller.dart';
 import '../../features/session_control/sleepy_screen.dart';
 import '../../features/settings/settings_controller.dart';
 import '../../l10n/app_localizations.dart';
+import '../widgets/exit_slider.dart';
 import 'activity_registry.dart';
 import 'activity_spec.dart';
 import 'game_context.dart';
@@ -168,34 +169,13 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     ? Alignment.topLeft
                     : Alignment.topRight,
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Semantics(
-                    label: l10n.semanticsBack,
-                    button: true,
-                    child: GestureDetector(
-                      onTap: () {
-                        if (!_completed) Navigator.of(context).maybePop();
-                      },
-                      child: Container(
-                        width: 88,
-                        height: 88,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.85),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: settings.highContrast
-                                ? Palette.outlineStrong
-                                : Palette.outline.withValues(alpha: 0.4),
-                            width: settings.highContrast ? 3 : 2,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.home_rounded,
-                          size: 44,
-                          color: Palette.textDark,
-                        ),
-                      ),
-                    ),
+                  padding: const EdgeInsets.all(8),
+                  child: ExitSlider(
+                    semanticLabel: l10n.semanticsBack,
+                    highContrast: settings.highContrast,
+                    onExit: () {
+                      if (!_completed) Navigator.of(context).maybePop();
+                    },
                   ),
                 ),
               ),

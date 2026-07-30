@@ -57,6 +57,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subjectLetters => 'Letters';
 
   @override
+  String get subjectArt => 'Art';
+
+  @override
   String get subjectMilosWorld => 'Milo\'s World';
 
   @override

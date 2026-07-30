@@ -82,6 +82,8 @@ enum VoiceInstruction {
   pathIntro,
   roomsIntro,
   levelUp,
+  paintIntro,
+  paintDone,
 
   // Colors
   colorRed,
@@ -154,10 +156,12 @@ class VoiceCatalog {
   }
 
   /// Asset path (relative to the assets/ audio root used by audioplayers).
+  /// Voice clips are OGG Vorbis (see tool/gen_speech.py); drop human
+  /// recordings in with the same names to replace them.
   static String assetPath(VoiceInstruction instruction, String languageCode) {
     final lang = supportedLanguages.contains(languageCode)
         ? languageCode
         : supportedLanguages.first;
-    return 'audio/voices/$lang/${fileId(instruction)}.wav';
+    return 'audio/voices/$lang/${fileId(instruction)}.ogg';
   }
 }

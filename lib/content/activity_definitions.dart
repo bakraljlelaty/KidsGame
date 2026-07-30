@@ -190,6 +190,34 @@ class ActivityDefinitions {
         skills: [Skill.fineMotor]),
   ];
 
+  /// Open-ended creativity: finger painting and picture stamps.
+  /// Participation is the only goal — the big star finishes a picture.
+  static const List<ActivitySpec> art = [
+    ActivitySpec(
+        id: 'art_paint', engine: ActivityEngine.freePaint,
+        subject: Subject.art, contentPack: 'colors',
+        skills: [Skill.fineMotor, Skill.colors]),
+    ActivitySpec(
+        id: 'art_stamps_animals', engine: ActivityEngine.freePaint,
+        subject: Subject.art, contentPack: 'animals',
+        params: {'stamps': 1},
+        skills: [Skill.fineMotor, Skill.animals]),
+    ActivitySpec(
+        id: 'art_stamps_shapes', engine: ActivityEngine.freePaint,
+        subject: Subject.art, contentPack: 'shapes',
+        params: {'stamps': 1},
+        skills: [Skill.fineMotor, Skill.shapes]),
+    ActivitySpec(
+        id: 'art_stamps_food', engine: ActivityEngine.freePaint,
+        subject: Subject.art, contentPack: 'food',
+        params: {'stamps': 1},
+        skills: [Skill.fineMotor]),
+    ActivitySpec(
+        id: 'art_trace_shapes', engine: ActivityEngine.traceShape,
+        subject: Subject.art, contentPack: 'shapes',
+        skills: [Skill.fineMotor, Skill.shapes]),
+  ];
+
   /// The six bespoke v1 mini-games as path/room nodes.
   static const List<ActivitySpec> milosWorld = [
     ActivitySpec(
@@ -225,6 +253,7 @@ class ActivityDefinitions {
         Subject.food => food,
         Subject.numbers => numbers,
         Subject.letters => letters,
+        Subject.art => art,
         Subject.milosWorld => milosWorld,
       };
 
@@ -236,6 +265,7 @@ class ActivityDefinitions {
         Subject.food,
         Subject.numbers,
         if (BandConfig.of(band).lettersEnabled) Subject.letters,
+        Subject.art,
         Subject.milosWorld,
       ];
 

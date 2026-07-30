@@ -9,6 +9,7 @@ enum Subject {
   food('food'),
   numbers('numbers'),
   letters('letters'),
+  art('art'),
   milosWorld('milos_world');
 
   const Subject(this.storageKey);

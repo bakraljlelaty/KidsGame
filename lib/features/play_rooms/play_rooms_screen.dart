@@ -43,6 +43,7 @@ class _PlayRoomsScreenState extends State<PlayRoomsScreen> {
         Subject.food => l10n.subjectFood,
         Subject.numbers => l10n.subjectNumbers,
         Subject.letters => l10n.subjectLetters,
+        Subject.art => l10n.subjectArt,
         Subject.milosWorld => l10n.subjectMilosWorld,
       };
 
@@ -197,6 +198,7 @@ class SubjectRoomScreen extends StatelessWidget {
         ActivityEngine.patternComplete => Icons.more_horiz_rounded,
         ActivityEngine.countAndGive => Icons.exposure_plus_1_rounded,
         ActivityEngine.traceShape => Icons.gesture_rounded,
+        ActivityEngine.freePaint => Icons.brush_rounded,
         ActivityEngine.bespoke => Icons.sports_esports_rounded,
       };
 

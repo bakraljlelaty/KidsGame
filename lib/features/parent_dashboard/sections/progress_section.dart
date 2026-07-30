@@ -43,6 +43,7 @@ class ProgressSection extends StatelessWidget {
         Subject.food => l10n.subjectFood,
         Subject.numbers => l10n.subjectNumbers,
         Subject.letters => l10n.subjectLetters,
+        Subject.art => l10n.subjectArt,
         Subject.milosWorld => l10n.subjectMilosWorld,
       };
 

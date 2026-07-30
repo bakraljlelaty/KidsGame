@@ -64,9 +64,6 @@ class AudioManager implements GameAudio {
       }
       _initialized = true;
 
-      await AudioPlayer.global.setAudioContext(
-        AudioContextConfig(respectSilence: true).build(),
-      );
       await _music!.setReleaseMode(ReleaseMode.loop);
       await _music!.setVolume(_musicVolume);
       await _voice!.setVolume(_voiceVolume);

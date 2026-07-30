@@ -194,6 +194,12 @@ abstract class AppLocalizations {
   /// **'Letters'**
   String get subjectLetters;
 
+  /// No description provided for @subjectArt.
+  ///
+  /// In en, this message translates to:
+  /// **'Art'**
+  String get subjectArt;
+
   /// No description provided for @subjectMilosWorld.
   ///
   /// In en, this message translates to:
