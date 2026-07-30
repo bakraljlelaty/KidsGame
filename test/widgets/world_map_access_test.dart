@@ -17,14 +17,18 @@ void main() {
     );
     expect(services.gameAccess.access.isEnabled(GameId.feedAnimals), isFalse);
 
-    // Tap the big play button on the home screen -> world map.
-    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    final l10n = AppLocalizationsEn();
+
+    // Home -> play rooms -> Milo's World (v2 academy structure).
+    await tester.tap(find.byIcon(Icons.apps_rounded));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.tap(find.text(l10n.subjectMilosWorld));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.byType(WorldMapScreen), findsOneWidget);
-
-    final l10n = AppLocalizationsEn();
 
     // The disabled Feed the Animals tile must not open the game.
     await tester.tap(find.text(l10n.gameFeedAnimals), warnIfMissed: false);

@@ -28,6 +28,8 @@ class ProgressSection extends StatelessWidget {
         Skill.animals => l10n.skillAnimals,
         Skill.spatial => l10n.skillSpatial,
         Skill.fineMotor => l10n.skillFineMotor,
+        Skill.memory => l10n.skillMemory,
+        Skill.patterns => l10n.skillPatterns,
       };
 
   @override

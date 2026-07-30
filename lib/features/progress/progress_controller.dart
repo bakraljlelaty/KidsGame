@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../shared/models/game_id.dart';
 import '../../shared/models/skill.dart';
+import '../../shared/models/subject.dart';
 import '../profiles/profile_controller.dart';
 import 'progress_data.dart';
 
@@ -83,13 +84,70 @@ class ProgressController extends ChangeNotifier {
     await _maybeAdvanceStage(streak);
   }
 
+  // ---- Academy activities (engine-based, keyed by subject) ----
+
+  Future<void> recordActivityStarted(Subject subject) async {
+    final s = _data.ofSubject(subject);
+    await _update(
+      _data.copyWith(
+        subjects: {
+          ..._data.subjects,
+          subject: s.copyWith(attempts: s.attempts + 1),
+        },
+      ),
+    );
+  }
+
+  Future<void> recordActivityHint(Subject subject) async {
+    final s = _data.ofSubject(subject);
+    await _update(
+      _data.copyWith(
+        subjects: {
+          ..._data.subjects,
+          subject: s.copyWith(hintsShown: s.hintsShown + 1),
+        },
+      ),
+    );
+  }
+
+  Future<void> recordActivityCompletion(
+    Subject subject, {
+    required List<Skill> skills,
+    required bool usedHints,
+    required Duration playTime,
+  }) async {
+    final s = _data.ofSubject(subject);
+    final updated = s.copyWith(
+      completions: s.completions + 1,
+      completionsWithoutHints:
+          s.completionsWithoutHints + (usedHints ? 0 : 1),
+      playMs: s.playMs + playTime.inMilliseconds,
+    );
+    final updatedSkills = {..._data.skillPlays};
+    for (final skill in skills) {
+      updatedSkills[skill] = (updatedSkills[skill] ?? 0) + 1;
+    }
+    final streak = _data.relaxedCompletionStreak + (usedHints ? 0 : 1);
+    await _update(
+      _data.copyWith(
+        subjects: {..._data.subjects, subject: updated},
+        skillPlays: updatedSkills,
+        relaxedCompletionStreak: streak,
+      ),
+    );
+    await _maybeAdvanceStage(streak);
+  }
+
+  /// Gentle automatic age-band progression: several relaxed (hint-free)
+  /// completions across sessions move the band up one step. Never based on
+  /// speed.
   Future<void> _maybeAdvanceStage(int streak) async {
     final profile = _profile.profile;
     if (!profile.autoStageProgression) return;
     if (streak < advanceAfterRelaxedCompletions) return;
-    final next = profile.stage.next;
+    final next = profile.band.next;
     if (next == null) return;
-    await _profile.setStage(next);
+    await _profile.setBand(next);
     await _update(_data.copyWith(relaxedCompletionStreak: 0));
   }
 

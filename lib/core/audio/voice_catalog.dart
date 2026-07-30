@@ -61,6 +61,76 @@ enum VoiceInstruction {
   bedtimeTeddy,
   bedtimeLight,
   bedtimeDone,
+
+  // ---- Academy (v2) ----
+
+  // Engine prompts
+  findIt,
+  sortIntro,
+  sortNext,
+  shadowIntro,
+  shadowNext,
+  memoryIntro,
+  memoryPairFound,
+  patternIntro,
+  patternNext,
+  countIntro,
+  giveMe,
+  traceIntro,
+  traceFollow,
+  unitDone,
+  pathIntro,
+  roomsIntro,
+  levelUp,
+
+  // Colors
+  colorRed,
+  colorBlue,
+  colorYellow,
+  colorGreen,
+  colorOrange,
+  colorPurple,
+  colorPink,
+
+  // Shapes
+  shapeCircle,
+  shapeSquare,
+  shapeTriangle,
+  shapeStar,
+  shapeHeart,
+  shapeRectangle,
+  shapeOval,
+  shapeDiamond,
+
+  // Numbers four..ten (one..three exist above)
+  countFour,
+  countFive,
+  countSix,
+  countSeven,
+  countEight,
+  countNine,
+  countTen,
+
+  // English letters
+  letterA, letterB, letterC, letterD, letterE, letterF, letterG,
+  letterH, letterI, letterJ, letterK, letterL, letterM, letterN,
+  letterO, letterP, letterQ, letterR, letterS, letterT, letterU,
+  letterV, letterW, letterX, letterY, letterZ,
+
+  // Arabic letters
+  arAlif, arBa, arTa, arTha, arJim, arHha, arKha, arDal, arDhal,
+  arRa, arZay, arSin, arShin, arSad, arDad, arTta, arZza, arAin,
+  arGhain, arFa, arQaf, arKaf, arLam, arMim, arNun, arHa, arWaw,
+  arYa,
+
+  // Item names: animals
+  nameRabbit, nameCow, nameMonkey, nameDuck, nameFish,
+  nameCat, nameDog, nameBee, nameButterfly, nameLadybug,
+
+  // Item names: food
+  nameApple, nameBanana, nameStrawberry, nameOrange, namePear,
+  nameGrapes, nameBread, nameMilk, nameCheese, nameEgg,
+  nameCarrot, nameCookie,
 }
 
 class VoiceCatalog {

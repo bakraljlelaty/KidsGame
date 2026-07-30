@@ -3,12 +3,11 @@ import 'package:provider/provider.dart';
 
 import '../../../core/theme/palette.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/models/development_stage.dart';
-import '../../profiles/child_profile.dart';
+import '../../../shared/models/age_band.dart';
 import '../../profiles/profile_controller.dart';
 import '../../settings/settings_controller.dart';
 
-/// Child profile: nickname, approximate age group, avatar, language, stage.
+/// Child profile: nickname, age band, avatar, language.
 /// Deliberately collects no real personal data.
 class ProfileSection extends StatelessWidget {
   const ProfileSection({super.key});
@@ -41,24 +40,6 @@ class ProfileSection extends StatelessWidget {
                     border: const OutlineInputBorder(),
                   ),
                   onChanged: profileController.setNickname,
-                ),
-                const SizedBox(height: 12),
-                Text(l10n.profileAgeGroup),
-                const SizedBox(height: 8),
-                SegmentedButton<AgeGroup>(
-                  segments: [
-                    ButtonSegment(
-                      value: AgeGroup.aroundTwo,
-                      label: Text(l10n.ageGroupTwo),
-                    ),
-                    ButtonSegment(
-                      value: AgeGroup.aroundThree,
-                      label: Text(l10n.ageGroupThree),
-                    ),
-                  ],
-                  selected: {profile.ageGroup},
-                  onSelectionChanged: (selection) =>
-                      profileController.setAgeGroup(selection.first),
                 ),
                 const SizedBox(height: 16),
                 Text(l10n.profileAvatar),
@@ -122,33 +103,31 @@ class ProfileSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.profileStage,
+                Text(l10n.profileBand,
                     style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
-                for (final stage in DevelopmentStage.values)
-                  RadioListTile<DevelopmentStage>(
-                    value: stage,
+                for (final band in AgeBand.values)
+                  RadioListTile<AgeBand>(
+                    value: band,
                     // ignore: deprecated_member_use
-                    groupValue: profile.stage,
+                    groupValue: profile.band,
                     // ignore: deprecated_member_use
                     onChanged: (value) {
                       if (value != null) {
-                        profileController.setStage(value);
+                        profileController.setBand(value);
                       }
                     },
-                    title: Text(switch (stage) {
-                      DevelopmentStage.explorer => l10n.stageExplorer,
-                      DevelopmentStage.helper => l10n.stageHelper,
-                      DevelopmentStage.littleThinker =>
-                        l10n.stageLittleThinker,
+                    title: Text(switch (band) {
+                      AgeBand.twoToThree => l10n.bandTwoThree,
+                      AgeBand.threeToFour => l10n.bandThreeFour,
+                      AgeBand.fourToFive => l10n.bandFourFive,
+                      AgeBand.fiveToSix => l10n.bandFiveSix,
                     }),
-                    subtitle: Text(switch (stage) {
-                      DevelopmentStage.explorer =>
-                        l10n.stageExplorerDescription,
-                      DevelopmentStage.helper =>
-                        l10n.stageHelperDescription,
-                      DevelopmentStage.littleThinker =>
-                        l10n.stageLittleThinkerDescription,
+                    subtitle: Text(switch (band) {
+                      AgeBand.twoToThree => l10n.bandTwoThreeDescription,
+                      AgeBand.threeToFour => l10n.bandThreeFourDescription,
+                      AgeBand.fourToFive => l10n.bandFourFiveDescription,
+                      AgeBand.fiveToSix => l10n.bandFiveSixDescription,
                     }),
                   ),
                 SwitchListTile(

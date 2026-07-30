@@ -51,6 +51,8 @@ class _MiniGameScreenState extends State<MiniGameScreen> {
 
     final gameContext = GameContext(
       stageConfig: StageConfig.of(profile.profile.stage),
+      bandConfig: profile.bandConfig,
+      languageCode: settings.languageCode,
       audio: audio,
       haptics: AppHaptics(enabled: settings.hapticsEnabled),
       reducedMotion: settings.reducedMotion,

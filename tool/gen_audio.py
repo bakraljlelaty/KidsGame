@@ -159,7 +159,8 @@ def voice_instruction_ids():
     with open(path) as f:
         src = f.read()
     body = re.search(r"enum VoiceInstruction \{(.*?)\}", src, re.S).group(1)
-    names = re.findall(r"^\s*([a-zA-Z][a-zA-Z0-9]*)\s*,", body, re.M)
+    body = re.sub(r"//[^\n]*", "", body)  # strip comments
+    names = re.findall(r"\b([a-zA-Z][a-zA-Z0-9]*)\s*,", body)
     snake = [re.sub(r"([A-Z])", lambda m: "_" + m.group(1).lower(), n)
              for n in names]
     return snake

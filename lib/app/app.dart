@@ -7,6 +7,7 @@ import '../core/audio/audio_manager.dart';
 import '../core/audio/sound_effects.dart';
 import '../core/theme/app_theme.dart';
 import '../features/child_home/child_home_screen.dart';
+import '../features/learning_path/path_progress.dart';
 import '../features/parent_dashboard/game_access_controller.dart';
 import '../features/profiles/profile_controller.dart';
 import '../features/progress/progress_controller.dart';
@@ -81,6 +82,8 @@ class _LittleWonderAppState extends State<LittleWonderApp>
             value: services.stickerBook),
         ChangeNotifierProvider<SessionController>.value(
             value: services.session),
+        ChangeNotifierProvider<PathProgressController>.value(
+            value: services.pathProgress),
       ],
       child: Consumer<SettingsController>(
         builder: (context, settings, _) {

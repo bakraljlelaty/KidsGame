@@ -13,7 +13,9 @@ enum Skill {
   attention('attention'),
   animals('animals'),
   spatial('spatial'),
-  fineMotor('fine_motor');
+  fineMotor('fine_motor'),
+  memory('memory'),
+  patterns('patterns');
 
   const Skill(this.storageKey);
 

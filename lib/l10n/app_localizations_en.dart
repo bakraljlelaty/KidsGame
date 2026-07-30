@@ -30,7 +30,71 @@ class AppLocalizationsEn extends AppLocalizations {
   String get semanticsPlay => 'Play';
 
   @override
+  String get semanticsPath => 'Learning path';
+
+  @override
+  String get semanticsRooms => 'Play rooms';
+
+  @override
   String get semanticsStickerBook => 'Sticker book';
+
+  @override
+  String get subjectColors => 'Colors';
+
+  @override
+  String get subjectShapes => 'Shapes';
+
+  @override
+  String get subjectAnimals => 'Animals';
+
+  @override
+  String get subjectFood => 'Food';
+
+  @override
+  String get subjectNumbers => 'Numbers';
+
+  @override
+  String get subjectLetters => 'Letters';
+
+  @override
+  String get subjectMilosWorld => 'Milo\'s World';
+
+  @override
+  String get profileBand => 'Age band';
+
+  @override
+  String get bandTwoThree => 'Ages 2–3';
+
+  @override
+  String get bandThreeFour => 'Ages 3–4';
+
+  @override
+  String get bandFourFive => 'Ages 4–5';
+
+  @override
+  String get bandFiveSix => 'Ages 5–6';
+
+  @override
+  String get bandTwoThreeDescription =>
+      'First discoveries: two big choices, lots of help, colours and shapes.';
+
+  @override
+  String get bandThreeFourDescription =>
+      'Three choices, first letters, counting to five.';
+
+  @override
+  String get bandFourFiveDescription =>
+      'Four choices, patterns, counting to seven, first tracing.';
+
+  @override
+  String get bandFiveSixDescription =>
+      'Longer patterns, counting to ten, the full alphabet and finer tracing.';
+
+  @override
+  String get skillMemory => 'Memory';
+
+  @override
+  String get skillPatterns => 'Patterns';
 
   @override
   String get semanticsBack => 'Go back';

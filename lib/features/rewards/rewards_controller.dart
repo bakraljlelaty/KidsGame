@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../shared/models/game_id.dart';
+import '../../shared/models/subject.dart';
 import 'reward_data.dart';
 import 'sticker_catalog.dart';
 
@@ -65,6 +66,41 @@ class RewardsController extends ChangeNotifier {
       totalStarsForGame: updated.starsFor(id),
       sticker:
           newSticker ?? (gameStickers.isNotEmpty ? gameStickers.first : null),
+      isNewSticker: newSticker != null,
+    );
+  }
+
+  /// Awards a star for an academy activity; a sticker joins the
+  /// celebration when a path unit was just completed (participation-based,
+  /// never performance-based).
+  Future<CompletionReward> awardActivityCompletion(
+    Subject subject, {
+    bool unitCompleted = false,
+  }) async {
+    StickerDef? newSticker;
+    if (unitCompleted) {
+      for (final sticker in StickerCatalog.all) {
+        if (!_data.earnedStickerIds.contains(sticker.id)) {
+          newSticker = sticker;
+          break;
+        }
+      }
+    }
+    final updated = _data.copyWith(
+      subjectStars: {
+        ..._data.subjectStars,
+        subject: _data.starsForSubject(subject) + 1,
+      },
+      earnedStickerIds: {
+        ..._data.earnedStickerIds,
+        if (newSticker != null) newSticker.id,
+      },
+      decorationPoints: _data.decorationPoints + 1,
+    );
+    await _update(updated);
+    return CompletionReward(
+      totalStarsForGame: updated.starsForSubject(subject),
+      sticker: newSticker,
       isNewSticker: newSticker != null,
     );
   }

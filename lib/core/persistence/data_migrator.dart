@@ -22,7 +22,7 @@ class DataMigrator {
     return current;
   }
 
-  static const int _latest = 1;
+  static const int _latest = 2;
 
   static Map<String, dynamic> _step(
     String storeKey,
@@ -30,10 +30,21 @@ class DataMigrator {
     int fromVersion,
   ) {
     switch (fromVersion) {
-      // Example for the future:
-      // case 1:
-      //   if (storeKey == 'profile') { data['avatarId'] ??= 'milo'; }
-      //   return data;
+      case 1:
+        // v1 -> v2: the academy AgeBand replaces the v1 development stage
+        // and approximate age group on the profile document.
+        if (storeKey == 'profile' && data['band'] == null) {
+          final stage = data['stage'] as String?;
+          final ageGroup = data['ageGroup'] as String?;
+          data['band'] = switch (stage) {
+            'helper' => 'three_four',
+            'little_thinker' => 'four_five',
+            _ => ageGroup == 'around_three' ? 'three_four' : 'two_three',
+          };
+          data.remove('stage');
+          data.remove('ageGroup');
+        }
+        return data;
       default:
         return data;
     }

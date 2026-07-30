@@ -2,6 +2,7 @@ import '../../core/persistence/json_document.dart';
 import '../../core/persistence/local_store.dart';
 import '../../shared/models/game_id.dart';
 import '../../shared/models/skill.dart';
+import '../../shared/models/subject.dart';
 
 /// Neutral play statistics for one mini-game.
 ///
@@ -59,12 +60,17 @@ class GameProgress {
 class ProgressData {
   ProgressData({
     Map<GameId, GameProgress>? games,
+    Map<Subject, GameProgress>? subjects,
     Map<Skill, int>? skillPlays,
     this.relaxedCompletionStreak = 0,
   })  : games = games ?? {},
+        subjects = subjects ?? {},
         skillPlays = skillPlays ?? {};
 
   final Map<GameId, GameProgress> games;
+
+  /// Academy activity statistics per concept area (v2).
+  final Map<Subject, GameProgress> subjects;
 
   /// How often each skill was part of a completed activity.
   final Map<Skill, int> skillPlays;
@@ -75,16 +81,19 @@ class ProgressData {
 
   GameProgress of(GameId id) => games[id] ?? const GameProgress();
 
-  int get totalPlayMs =>
-      games.values.fold(0, (sum, g) => sum + g.playMs);
+  GameProgress ofSubject(Subject subject) =>
+      subjects[subject] ?? const GameProgress();
 
-  int get totalAttempts => games.values.fold(0, (sum, g) => sum + g.attempts);
+  Iterable<GameProgress> get _all =>
+      [...games.values, ...subjects.values];
 
-  int get totalCompletions =>
-      games.values.fold(0, (sum, g) => sum + g.completions);
+  int get totalPlayMs => _all.fold(0, (sum, g) => sum + g.playMs);
 
-  int get totalHintsShown =>
-      games.values.fold(0, (sum, g) => sum + g.hintsShown);
+  int get totalAttempts => _all.fold(0, (sum, g) => sum + g.attempts);
+
+  int get totalCompletions => _all.fold(0, (sum, g) => sum + g.completions);
+
+  int get totalHintsShown => _all.fold(0, (sum, g) => sum + g.hintsShown);
 
   /// Games ordered by how often the child chose them (most first).
   List<GameId> get favourites {
@@ -101,11 +110,13 @@ class ProgressData {
 
   ProgressData copyWith({
     Map<GameId, GameProgress>? games,
+    Map<Subject, GameProgress>? subjects,
     Map<Skill, int>? skillPlays,
     int? relaxedCompletionStreak,
   }) =>
       ProgressData(
         games: games ?? this.games,
+        subjects: subjects ?? this.subjects,
         skillPlays: skillPlays ?? this.skillPlays,
         relaxedCompletionStreak:
             relaxedCompletionStreak ?? this.relaxedCompletionStreak,
@@ -115,6 +126,9 @@ class ProgressData {
         'games': {
           for (final e in games.entries) e.key.storageKey: e.value.toJson(),
         },
+        'subjects': {
+          for (final e in subjects.entries) e.key.storageKey: e.value.toJson(),
+        },
         'skillPlays': {
           for (final e in skillPlays.entries) e.key.storageKey: e.value,
         },
@@ -123,6 +137,8 @@ class ProgressData {
 
   factory ProgressData.fromJson(Map<String, dynamic> json) {
     final gamesRaw = (json['games'] as Map?)?.cast<String, dynamic>() ?? {};
+    final subjectsRaw =
+        (json['subjects'] as Map?)?.cast<String, dynamic>() ?? {};
     final skillsRaw =
         (json['skillPlays'] as Map?)?.cast<String, dynamic>() ?? {};
     return ProgressData(
@@ -130,6 +146,13 @@ class ProgressData {
         for (final e in gamesRaw.entries)
           if (GameId.fromStorageKey(e.key) != null)
             GameId.fromStorageKey(e.key)!: GameProgress.fromJson(
+              (e.value as Map).cast<String, dynamic>(),
+            ),
+      },
+      subjects: {
+        for (final e in subjectsRaw.entries)
+          if (Subject.fromStorageKey(e.key) != null)
+            Subject.fromStorageKey(e.key)!: GameProgress.fromJson(
               (e.value as Map).cast<String, dynamic>(),
             ),
       },

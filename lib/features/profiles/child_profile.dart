@@ -1,75 +1,80 @@
 import '../../core/persistence/json_document.dart';
 import '../../core/persistence/local_store.dart';
+import '../../shared/models/age_band.dart';
 import '../../shared/models/development_stage.dart';
 
-/// Approximate age group only — never an exact birth date.
-enum AgeGroup {
-  aroundTwo('around_two'),
-  aroundThree('around_three');
-
-  const AgeGroup(this.storageKey);
-  final String storageKey;
-
-  static AgeGroup fromStorageKey(String? key) =>
-      key == AgeGroup.aroundThree.storageKey
-          ? AgeGroup.aroundThree
-          : AgeGroup.aroundTwo;
-}
-
-/// Minimal child profile: nickname, approximate age group, avatar, language,
-/// stage. Deliberately excludes real names, birth dates, photos, or any
-/// other personal data.
+/// Minimal child profile: nickname, age band, avatar, language. Deliberately
+/// excludes real names, birth dates, photos, or any other personal data.
+///
+/// v2: the academy's [AgeBand] replaces the v1 age group + development
+/// stage; [stage] remains as a derived value for the six bespoke
+/// mini-games and old call sites.
 class ChildProfile {
   const ChildProfile({
     this.nickname = '',
-    this.ageGroup = AgeGroup.aroundTwo,
+    this.band = AgeBand.twoToThree,
     this.avatarId = 'star',
     this.languageCode = 'en',
-    this.stage = DevelopmentStage.explorer,
     this.autoStageProgression = true,
   });
 
   final String nickname;
-  final AgeGroup ageGroup;
+  final AgeBand band;
   final String avatarId;
   final String languageCode;
-  final DevelopmentStage stage;
+
+  /// Gentle automatic band progression (never speed-based).
   final bool autoStageProgression;
+
+  /// v1 compatibility: the stage the bespoke mini-games play at.
+  DevelopmentStage get stage => band.legacyStage;
 
   ChildProfile copyWith({
     String? nickname,
-    AgeGroup? ageGroup,
+    AgeBand? band,
     String? avatarId,
     String? languageCode,
-    DevelopmentStage? stage,
     bool? autoStageProgression,
   }) =>
       ChildProfile(
         nickname: nickname ?? this.nickname,
-        ageGroup: ageGroup ?? this.ageGroup,
+        band: band ?? this.band,
         avatarId: avatarId ?? this.avatarId,
         languageCode: languageCode ?? this.languageCode,
-        stage: stage ?? this.stage,
         autoStageProgression: autoStageProgression ?? this.autoStageProgression,
       );
 
   Map<String, dynamic> toJson() => {
         'nickname': nickname,
-        'ageGroup': ageGroup.storageKey,
+        'band': band.storageKey,
         'avatarId': avatarId,
         'languageCode': languageCode,
-        'stage': stage.storageKey,
         'autoStageProgression': autoStageProgression,
       };
 
-  factory ChildProfile.fromJson(Map<String, dynamic> json) => ChildProfile(
-        nickname: json['nickname'] as String? ?? '',
-        ageGroup: AgeGroup.fromStorageKey(json['ageGroup'] as String?),
-        avatarId: json['avatarId'] as String? ?? 'star',
-        languageCode: json['languageCode'] as String? ?? 'en',
-        stage: DevelopmentStage.fromStorageKey(json['stage'] as String?),
-        autoStageProgression: json['autoStageProgression'] as bool? ?? true,
+  factory ChildProfile.fromJson(Map<String, dynamic> json) {
+    // Defensive in-model migration: v1 documents carried 'stage' and
+    // 'ageGroup' instead of 'band' (formally handled by DataMigrator, but a
+    // fallback here keeps any straggler document safe).
+    AgeBand band;
+    final bandKey = json['band'] as String?;
+    if (bandKey != null) {
+      band = AgeBand.fromStorageKey(bandKey);
+    } else if (json['stage'] != null) {
+      band = AgeBand.fromLegacyStage(
+        DevelopmentStage.fromStorageKey(json['stage'] as String?),
       );
+    } else {
+      band = AgeBand.twoToThree;
+    }
+    return ChildProfile(
+      nickname: json['nickname'] as String? ?? '',
+      band: band,
+      avatarId: json['avatarId'] as String? ?? 'star',
+      languageCode: json['languageCode'] as String? ?? 'en',
+      autoStageProgression: json['autoStageProgression'] as bool? ?? true,
+    );
+  }
 }
 
 class ProfileRepository {

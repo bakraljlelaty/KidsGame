@@ -10,12 +10,13 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/characters/milo_state.dart';
 import '../../shared/characters/milo_view.dart';
 import '../../shared/widgets/big_round_button.dart';
+import '../learning_path/learning_path_screen.dart';
 import '../parent_gate/parent_corner_gate.dart';
 import '../parent_gate/pin_screen.dart';
+import '../play_rooms/play_rooms_screen.dart';
 import '../session_control/session_controller.dart';
 import '../settings/settings_controller.dart';
 import '../sticker_book/sticker_book_screen.dart';
-import '../world_map/world_map_screen.dart';
 
 /// The child's landing screen: Milo waves, one big play button, the sticker
 /// book, and the (hidden) parent gate. No text reading required.
@@ -48,14 +49,16 @@ class _ChildHomeScreenState extends State<ChildHomeScreen> {
     }
   }
 
-  void _onPlay() {
+  void _onPlay({required bool guided}) {
     final session = context.read<SessionController>();
     final audio = context.read<AudioManager>();
     if (session.startSession()) {
       audio.playEffect(SoundEffect.chimeSoft);
       AppNavigation.push<void>(
         context,
-        (_) => const WorldMapScreen(),
+        (_) => guided
+            ? const LearningPathScreen()
+            : const PlayRoomsScreen(),
         reducedMotion:
             context.read<SettingsController>().settings.reducedMotion,
       );
@@ -131,17 +134,37 @@ class _ChildHomeScreenState extends State<ChildHomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (!resting)
-                          BigRoundButton(
-                            diameter: 150,
-                            color: Palette.mint,
-                            semanticLabel: l10n.semanticsPlay,
-                            highContrast: settings.highContrast,
-                            onPressed: _onPlay,
-                            child: const Icon(
-                              Icons.play_arrow_rounded,
-                              size: 84,
-                              color: Palette.textDark,
-                            ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Guided learning path.
+                              BigRoundButton(
+                                diameter: 150,
+                                color: Palette.mint,
+                                semanticLabel: l10n.semanticsPath,
+                                highContrast: settings.highContrast,
+                                onPressed: () => _onPlay(guided: true),
+                                child: const Icon(
+                                  Icons.play_arrow_rounded,
+                                  size: 84,
+                                  color: Palette.textDark,
+                                ),
+                              ),
+                              const SizedBox(width: 22),
+                              // Free-play rooms.
+                              BigRoundButton(
+                                diameter: 118,
+                                color: Palette.babyBlue,
+                                semanticLabel: l10n.semanticsRooms,
+                                highContrast: settings.highContrast,
+                                onPressed: () => _onPlay(guided: false),
+                                child: const Icon(
+                                  Icons.apps_rounded,
+                                  size: 58,
+                                  color: Palette.textDark,
+                                ),
+                              ),
+                            ],
                           ),
                         const SizedBox(height: 24),
                         BigRoundButton(

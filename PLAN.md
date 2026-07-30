@@ -1,121 +1,105 @@
-# Little Wonder World — Implementation Plan
+# Little Wonder Academy — Implementation Plan (v2)
 
 Working title configured in `lib/config/app_config.dart` (`AppConfig.appName`).
 
-## Goal
+## Product
 
-An offline-first, Android-first Flutter + Flame toddler game (ages 2–3) with six
-mini-games, an original guide character (Milo), three development stages, a
-PIN-protected parent dashboard, session-time controls, local-only persistence,
-rewards + sticker book, and English/Arabic localization.
+An offline-first early-learning **academy** for ages 2–6 (evolved from the v1
+six-game toddler MVP; see git history). Two ways to play:
 
-## Toolchain
+1. **Learning Path** (guided): units of short activity nodes that unlock in
+   order, narrated by Milo. One tap opens the next activity.
+2. **Play Rooms** (free): subject rooms where any unlocked activity can be
+   replayed — Shapes & Colors, Numbers, Letters, Logic & Memory, and
+   Milo's World (the six bespoke v1 mini-games).
 
-| Tool | Version |
-|---|---|
-| Flutter | 3.44.8 stable |
-| Dart | 3.12.2 (null safety) |
-| Flame | 1.38.x |
-| provider | 6.x (state management) |
-| shared_preferences | 2.x (local persistence) |
-| audioplayers | 6.x (music / effects / voice channels) |
-| flutter_localizations + gen-l10n | EN + AR |
+Four parent-selectable **age bands** — 2–3, 3–4, 4–5, 5–6 — tune every
+activity (item counts, distractors, hint delays, content ceilings such as
+"numbers up to 3 / 5 / 10"). Gentle automatic band progression, never
+speed-based. All v1 safety principles stand: no reading required in the
+child area, huge touch targets, no failure states, hint → assist ladder,
+session limits, offline-only, no ads/analytics/external links.
 
-No backend, no analytics, no ads, no network permissions used by the app.
+## The scale mechanism: engines × content packs
 
-## Architecture
+Production breadth comes from separating *how you play* from *what you play
+with*:
 
-Feature-based clean architecture. Rendering (Flame components / widgets) is
-separated from game rules (pure Dart, unit-testable), input handling, audio,
-persistence, rewards, difficulty configuration, and localization.
+- **Activity engines** (reusable Flame games on the v1 `ToddlerGame` base):
+  | Engine | Interaction | Teaches with |
+  |---|---|---|
+  | TapChoice | tap the right one of N | colors, shapes, letters, numbers, animals, odd-one-out |
+  | DragSort | drag items into 2–3 bins | sort by color/shape/size/category |
+  | ShadowMatch | drag object onto its silhouette | shapes, objects, letter forms |
+  | MemoryPairs | flip cards, find pairs | pictures, letters, quantities |
+  | PatternComplete | pick what comes next | AB/ABC/AABB patterns |
+  | CountAndGive | give N items to a character | quantities 1–10 |
+  | TraceShape | finger-trace a guided outline | shapes, letters, numbers |
+  | (bespoke v1) | six full mini-games | routines, motor skills |
+
+- **Content packs** (pure data in `lib/content/`): items with painter ids +
+  voice ids (shapes, colors, numbers 1–10, EN letters, AR letters, animals,
+  fruits, vehicles, toys). The **ItemArt catalog** procedurally draws every
+  item; art swaps to sprites later without touching engines.
+
+- **Learning path definition** (`lib/content/path/`): per age band, an
+  ordered list of units; each unit is ~6–8 nodes referencing
+  (engine, content selection, difficulty params). Node completion is
+  persisted; finishing a unit awards a badge sticker.
+
+## Architecture deltas from v1
 
 ```
 lib/
-  main.dart
-  app/                    root widget, provider wiring, lifecycle observer
-  config/                 app_config.dart (product name, default PIN, tunables)
-  core/
-    audio/                AudioManager, VoiceCatalog (instruction IDs -> files)
-    localization/         locale controller (l10n ARB files live in lib/l10n)
-    navigation/           route names + helpers
-    persistence/          LocalStore abstraction, JSON repositories, migration
-    theme/                warm pastel palette, parent/child themes
-    accessibility/        semantics helpers, motion/contrast settings surface
+  content/                       NEW: pure-data content packs + path defs
+    items/                       item catalogs per domain
+    path/                        unit/node definitions per age band
   features/
-    child_home/           Milo welcome screen, big play button, corner gate
-    world_map/            six-location world selection
-    feed_animals/         mini-game 1
-    bubble_pop/           mini-game 2
-    dancing_socks/        mini-game 3
-    muddy_pig/            mini-game 4
-    build_rocket/         mini-game 5
-    bedtime_routine/      mini-game 6
-    sticker_book/         offline sticker album with drag-to-place scenes
-    rewards/              stars, stickers, decoration progress, reward overlay
-    parent_gate/          two-corner 3s hold + PIN pad
-    parent_dashboard/     profile, game access, session, progress sections
-    profiles/             child profile model/controller
-    session_control/      session timer, daily limit, break, wind-down flow
-    progress/             neutral-wording progress tracking
-    settings/             audio/motion/contrast/haptics/language/data controls
+    learning_path/               NEW: path screen (units, nodes, progress)
+    play_rooms/                  NEW: subject rooms (replaces world_map as home hub;
+                                 world_map remains as the Milo's World room)
+    activities/                  NEW: the engine implementations
+      tap_choice/  drag_sort/  shadow_match/  memory_pairs/
+      pattern_complete/  count_and_give/  trace_shape/
   shared/
-    characters/           Milo painter + Flame component + widget (8 states)
-    components/           DraggableItem, DropZone, TapTarget, SwipeCleaner,
-                          snapping, hint highlight, gentle particles
-    game/                 ToddlerGame base, GameContext, hint controller,
-                          wrong-attempt escalation, MiniGameScreen wrapper,
-                          GameRegistry
-    models/               GameId, DevelopmentStage + StageConfig, Skill
-    widgets/              big round buttons, icon labels, star displays
-assets/
-  audio/music|effects|voices/en|voices/ar   (generated placeholder WAVs)
-  config/                 placeholder-asset manifest notes
+    models/ age_band.dart        NEW: AgeBand + BandConfig (supersedes stage
+                                 for tuning; DevelopmentStage kept for storage
+                                 migration)
+    game/ activity_spec.dart     NEW: ActivitySpec/ActivityRun contract between
+                                 path/rooms and engines
+    items/ item_art.dart         NEW: procedural painter catalog for all items
 ```
 
-## Key design decisions
+- **Persistence schema v2** (`DataMigrator` step 1→2): stage → age band
+  mapping (explorer→2–3, helper→3–4, littleThinker→4–5); v1 progress kept;
+  new `path_progress` document (completed node ids per band, unit badges).
+- **Voice catalog** grows: per-color/shape/number/letter prompt ids;
+  placeholder audio regenerated by `tool/gen_audio.py` (parses the enum, so
+  no manual list).
+- **Parent dashboard**: age band selector, per-subject toggles, path reset,
+  per-subject progress; session controls unchanged.
+- 6 bespoke games keep their `GameId`/registry and also appear as path nodes.
 
-1. **Placeholder art is code-drawn.** All art is original vector drawing via
-   CustomPainter / Flame canvas rendering. Each drawing lives behind a small
-   painter class so sprite sheets can replace it later without touching logic.
-2. **Placeholder audio is generated.** A Python script (`tool/gen_audio.py`)
-   synthesizes gentle sine-based chimes/loops into WAV files at build-prep
-   time; files are committed. Voice clips are per-instruction files named by
-   instruction ID so real recordings drop in with no code change.
-3. **Stage behaviour is data.** `StageConfig` (per `DevelopmentStage`) carries
-   hint delay (3/5/7 s), item counts, distractor counts, puzzle pieces,
-   auto-assist thresholds. Games read config; they never branch on stage enum
-   directly for tunables.
-4. **Wrong attempts are gentle.** Shared escalation: bounce back → replay
-   instruction (after 2nd try) → highlight destination (3rd) → auto-assist
-   (4th). No error symbols, no negative sounds.
-5. **Session wind-down.** When the timer elapses mid-activity the child may
-   finish the current mini-game; then the app returns to Milo who is sleepy.
-   New sessions blocked until the configured break passes or a parent unlocks.
-6. **Persistence.** `LocalStore` interface (SharedPreferences impl,
-   in-memory impl for tests); JSON documents carry `schemaVersion` and run
-   through `DataMigrator`. One `deleteAllChildData()` wipes everything.
-7. **Localization.** gen-l10n ARB files for all parent/child text; spoken
-   instructions referenced by `VoiceInstruction` enum, resolved by
-   `VoiceCatalog` to `assets/audio/voices/<lang>/<id>.wav`. Arabic parent UI is
-   RTL; game scenes are wrapped in LTR and not mirrored.
+## Delivery order (v2)
 
-## Delivery order
+1. ✅ v1 foundation (see history) — engine base, parent area, 6 games, tests
+2. Core academy layer: AgeBand/BandConfig, ActivitySpec, ItemArt catalog,
+   content-pack + path models, schema v2 migration
+3. Learning-path + play-rooms screens, home restructure
+4. Seven activity engines (parallel implementation)
+5. Content packs (shapes/colors/numbers/letters EN+AR/animals/objects) and
+   path definitions for all four bands
+6. Parent dashboard band/subject controls; progress per subject
+7. Voices + l10n additions (EN/AR); regenerate placeholder audio
+8. Tests: band config, migration, path progression, each engine's rules,
+   node gating; widget tests for path/rooms; smoke test kept green
+9. Docs refresh; analyze; full test run; APK/AAB build; push; deliver APK
 
-1. ✅ Environment inspection, Flutter + Android SDK installation
-2. Project skeleton, pubspec, this plan
-3. Core systems (theme, persistence, audio, l10n, stage config)
-4. Shared game framework + Milo character
-5. Parent gate, dashboard, settings, session control, progress
-6. Child home, world map, rewards, sticker book
-7. Six mini-games (parallel implementation on the shared framework)
-8. Tests (unit, widget, integration smoke) + toddler usability checklist
-9. Documentation set
-10. `flutter analyze` clean → all tests green → debug APK build → push
+## Acceptance (v2 additions)
 
-## Acceptance gates
-
-- App runs offline; all six games playable; three stages behave differently
-- Parent settings demonstrably affect the child experience
-- Session timer + break enforcement works; progress and stickers persist
-- EN + AR parent UI (AR is RTL); no external links in child area
-- `flutter analyze` passes; `flutter test` passes; debug APK builds
+- Learning path unlocks nodes in order and survives restart
+- Age bands demonstrably change activity difficulty and content ceilings
+- All seven engines playable with at least: shapes, colors, numbers 1–10,
+  EN letters, AR letters, animals content
+- v1 data migrates without loss; v1 six games still playable from their room
+- All v1 acceptance criteria still pass (analysis, tests, offline, RTL, APK)

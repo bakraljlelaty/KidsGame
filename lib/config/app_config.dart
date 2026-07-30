@@ -28,6 +28,11 @@ class AppConfig {
   static const int highlightTargetAfterAttempts = 3;
   static const int autoAssistAfterAttempts = 4;
 
+  /// Highest level of every mini-game. Levels ramp gently within the
+  /// child's development stage; completing a game advances its level.
+  static const int maxGameLevel = 5;
+
   /// Current local data schema version (see DataMigrator).
-  static const int dataSchemaVersion = 1;
+  /// v2: academy age bands replace the v1 age group + development stage.
+  static const int dataSchemaVersion = 2;
 }

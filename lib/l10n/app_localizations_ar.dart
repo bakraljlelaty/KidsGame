@@ -30,7 +30,71 @@ class AppLocalizationsAr extends AppLocalizations {
   String get semanticsPlay => 'العب';
 
   @override
+  String get semanticsPath => 'مسار التعلّم';
+
+  @override
+  String get semanticsRooms => 'غرف اللعب';
+
+  @override
   String get semanticsStickerBook => 'دفتر الملصقات';
+
+  @override
+  String get subjectColors => 'الألوان';
+
+  @override
+  String get subjectShapes => 'الأشكال';
+
+  @override
+  String get subjectAnimals => 'الحيوانات';
+
+  @override
+  String get subjectFood => 'الطعام';
+
+  @override
+  String get subjectNumbers => 'الأرقام';
+
+  @override
+  String get subjectLetters => 'الحروف';
+
+  @override
+  String get subjectMilosWorld => 'عالم ميلو';
+
+  @override
+  String get profileBand => 'الفئة العمرية';
+
+  @override
+  String get bandTwoThree => 'من سنتين إلى ٣ سنوات';
+
+  @override
+  String get bandThreeFour => 'من ٣ إلى ٤ سنوات';
+
+  @override
+  String get bandFourFive => 'من ٤ إلى ٥ سنوات';
+
+  @override
+  String get bandFiveSix => 'من ٥ إلى ٦ سنوات';
+
+  @override
+  String get bandTwoThreeDescription =>
+      'اكتشافات أولى: خياران كبيران، مساعدة كثيرة، ألوان وأشكال.';
+
+  @override
+  String get bandThreeFourDescription =>
+      'ثلاثة خيارات، أولى الحروف، والعدّ حتى خمسة.';
+
+  @override
+  String get bandFourFiveDescription =>
+      'أربعة خيارات، أنماط، عدّ حتى سبعة، وبداية تتبّع الأشكال.';
+
+  @override
+  String get bandFiveSixDescription =>
+      'أنماط أطول، عدّ حتى عشرة، كل الحروف، وتتبّع أدق.';
+
+  @override
+  String get skillMemory => 'الذاكرة';
+
+  @override
+  String get skillPatterns => 'الأنماط';
 
   @override
   String get semanticsBack => 'رجوع';

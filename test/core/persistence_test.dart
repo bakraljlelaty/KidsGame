@@ -84,7 +84,6 @@ void main() {
       final envelope = jsonDecode(raw!) as Map<String, dynamic>;
       expect(envelope.keys.toSet(), {'v', 'data'});
       expect(envelope['v'], AppConfig.dataSchemaVersion);
-      expect(envelope['v'], 1);
       expect(envelope['data'], {'name': 'milo'});
     });
 

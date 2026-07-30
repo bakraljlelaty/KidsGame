@@ -140,11 +140,131 @@ abstract class AppLocalizations {
   /// **'Play'**
   String get semanticsPlay;
 
+  /// No description provided for @semanticsPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning path'**
+  String get semanticsPath;
+
+  /// No description provided for @semanticsRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Play rooms'**
+  String get semanticsRooms;
+
   /// No description provided for @semanticsStickerBook.
   ///
   /// In en, this message translates to:
   /// **'Sticker book'**
   String get semanticsStickerBook;
+
+  /// No description provided for @subjectColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Colors'**
+  String get subjectColors;
+
+  /// No description provided for @subjectShapes.
+  ///
+  /// In en, this message translates to:
+  /// **'Shapes'**
+  String get subjectShapes;
+
+  /// No description provided for @subjectAnimals.
+  ///
+  /// In en, this message translates to:
+  /// **'Animals'**
+  String get subjectAnimals;
+
+  /// No description provided for @subjectFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get subjectFood;
+
+  /// No description provided for @subjectNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Numbers'**
+  String get subjectNumbers;
+
+  /// No description provided for @subjectLetters.
+  ///
+  /// In en, this message translates to:
+  /// **'Letters'**
+  String get subjectLetters;
+
+  /// No description provided for @subjectMilosWorld.
+  ///
+  /// In en, this message translates to:
+  /// **'Milo\'s World'**
+  String get subjectMilosWorld;
+
+  /// No description provided for @profileBand.
+  ///
+  /// In en, this message translates to:
+  /// **'Age band'**
+  String get profileBand;
+
+  /// No description provided for @bandTwoThree.
+  ///
+  /// In en, this message translates to:
+  /// **'Ages 2–3'**
+  String get bandTwoThree;
+
+  /// No description provided for @bandThreeFour.
+  ///
+  /// In en, this message translates to:
+  /// **'Ages 3–4'**
+  String get bandThreeFour;
+
+  /// No description provided for @bandFourFive.
+  ///
+  /// In en, this message translates to:
+  /// **'Ages 4–5'**
+  String get bandFourFive;
+
+  /// No description provided for @bandFiveSix.
+  ///
+  /// In en, this message translates to:
+  /// **'Ages 5–6'**
+  String get bandFiveSix;
+
+  /// No description provided for @bandTwoThreeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'First discoveries: two big choices, lots of help, colours and shapes.'**
+  String get bandTwoThreeDescription;
+
+  /// No description provided for @bandThreeFourDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Three choices, first letters, counting to five.'**
+  String get bandThreeFourDescription;
+
+  /// No description provided for @bandFourFiveDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Four choices, patterns, counting to seven, first tracing.'**
+  String get bandFourFiveDescription;
+
+  /// No description provided for @bandFiveSixDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Longer patterns, counting to ten, the full alphabet and finer tracing.'**
+  String get bandFiveSixDescription;
+
+  /// No description provided for @skillMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get skillMemory;
+
+  /// No description provided for @skillPatterns.
+  ///
+  /// In en, this message translates to:
+  /// **'Patterns'**
+  String get skillPatterns;
 
   /// No description provided for @semanticsBack.
   ///

@@ -1,5 +1,6 @@
 import '../core/audio/audio_manager.dart';
 import '../core/persistence/local_store.dart';
+import '../features/learning_path/path_progress.dart';
 import '../features/parent_dashboard/game_access.dart';
 import '../features/parent_dashboard/game_access_controller.dart';
 import '../features/profiles/child_profile.dart';
@@ -28,6 +29,7 @@ class AppServices {
     required this.rewards,
     required this.stickerBook,
     required this.session,
+    required this.pathProgress,
   });
 
   final LocalStore store;
@@ -39,6 +41,7 @@ class AppServices {
   final RewardsController rewards;
   final StickerBookController stickerBook;
   final SessionController session;
+  final PathProgressController pathProgress;
 
   static Future<AppServices> bootstrap({
     LocalStore? store,
@@ -63,6 +66,8 @@ class AppServices {
       clock: clock,
       enableAutoTick: enableAutoTick,
     );
+    final pathProgress =
+        PathProgressController(PathProgressRepository(localStore));
 
     await settings.init();
     await profile.init();
@@ -71,6 +76,7 @@ class AppServices {
     await rewards.init();
     await stickerBook.init();
     await session.init();
+    await pathProgress.init();
 
     if (initAudio) {
       await audio.init();
@@ -88,6 +94,7 @@ class AppServices {
       rewards: rewards,
       stickerBook: stickerBook,
       session: session,
+      pathProgress: pathProgress,
     );
   }
 
@@ -96,6 +103,7 @@ class AppServices {
     await progress.reset();
     await rewards.reset();
     await stickerBook.reset();
+    await pathProgress.reset();
   }
 
   /// "Delete all child data": wipes every locally stored key, then reloads
@@ -109,6 +117,7 @@ class AppServices {
     await rewards.reloadFromStore();
     await stickerBook.reloadFromStore();
     await session.reloadFromStore();
+    await pathProgress.reloadFromStore();
   }
 
   Future<void> dispose() async {

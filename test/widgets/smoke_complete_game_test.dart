@@ -13,8 +13,14 @@ void main() {
       '-> back on the world map with one star', (tester) async {
     final services = await pumpApp(tester);
 
-    // Home -> world map.
-    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    // Home -> play rooms -> Milo's World (the v2 academy home has a
+    // guided-path button and a free-play rooms button; the six bespoke
+    // games live in the Milo's World room).
+    await tester.tap(find.byIcon(Icons.apps_rounded));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.tap(find.text(AppLocalizationsEn().subjectMilosWorld));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pump(const Duration(milliseconds: 100));
