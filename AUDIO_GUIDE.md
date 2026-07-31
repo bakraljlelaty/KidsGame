@@ -6,6 +6,43 @@ Arabic synthesized offline by `tool/gen_speech.py` (espeak-ng + ffmpeg, OGG Vorb
 recordings replace the placeholders **1:1 by file
 name** — no code changes.
 
+## Getting a real human voice
+
+The bundled clips are neural TTS — good, but a warm human narrator is the
+production goal. Three routes, easiest first; all use the same file names,
+so you can replace one clip, one language, or everything at any time
+(anything not replaced keeps its synthetic audio):
+
+1. **Record it yourselves.** A parent's voice is genuinely the best voice a
+   small child can hear. Print `docs/VOICE_RECORDING_SCRIPT.md` (158 short
+   lines per language, with tone directions and fully vocalized Arabic),
+   record each line on a phone in a quiet room, name the files by clip id
+   (`welcome.m4a`, `find_it.wav`, ...) inside `en/` and `ar/` folders, then:
+
+       python3 tool/import_recordings.py /path/to/recordings
+
+   The importer accepts wav/mp3/m4a/aac/ogg/flac, loudness-normalizes to a
+   child-safe level, trims silence, converts to the app's format and tells
+   you exactly which clips are still missing.
+
+2. **Hire voice actors.** Hand a studio `tool/recording_script.csv` (or the
+   Markdown script) — one row per clip with English, vocalized Arabic and
+   direction notes. Ask for one file per row, named by clip id, WAV 44.1 kHz
+   mono. Then run the same importer. Typical cost: a children's-voice
+   session per language on any freelance marketplace.
+
+3. **Premium AI voice (near-human, minutes of work).** With an ElevenLabs
+   account (paid tiers include a commercial-use license — verify your
+   plan's current terms):
+
+       export ELEVEN_API_KEY=...
+       python3 tool/gen_speech_premium.py
+
+   Audition voices first and set `ELEVEN_VOICE_EN` / `ELEVEN_VOICE_AR`.
+   The multilingual model handles the vocalized Arabic well.
+
+After any route: `flutter build apk --release` and listen on the device.
+
 ## AudioManager: channels and settings
 
 `lib/core/audio/audio_manager.dart` is the central audio service. Three independent channels:

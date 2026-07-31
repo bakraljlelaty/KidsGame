@@ -1,0 +1,159 @@
+clip_id,section,direction,english,arabic
+welcome,Milo — greetings & celebration,"warm, smiling, unhurried; celebrate gently (never shout)",Hi! I'm Milo! Let's play together!,أَهْلاً! أَنا مِيلُو! هَيَّا نَلْعَبُ مَعاً!
+choose_game,Milo — greetings & celebration,"warm, smiling, unhurried; celebrate gently (never shout)",Pick a game! Which one do you like?,اِخْتَرْ لُعْبَةً! أَيُّها تُحِبُّ؟
+great_job,Milo — greetings & celebration,"warm, smiling, unhurried; celebrate gently (never shout)",Great job! You did it!,أَحْسَنْتَ! لَقَدْ نَجَحْتَ!
+well_done,Milo — greetings & celebration,"warm, smiling, unhurried; celebrate gently (never shout)",Well done! That was wonderful!,رائِعٌ! كانَ هٰذا جَميلاً جِدّاً!
+try_again,Milo — greetings & celebration,"warm, smiling, unhurried; celebrate gently (never shout)","Hmm, let's try again!",هَيَّا نُحاوِلُ مَرَّةً أُخْرَى!
+sticker_earned,Milo — greetings & celebration,"warm, smiling, unhurried; celebrate gently (never shout)",You got a new sticker! Yay!,حَصَلْتَ عَلَى مُلْصَقٍ جَديدٍ! يا سَلامْ!
+level_up,Milo — greetings & celebration,"warm, smiling, unhurried; celebrate gently (never shout)",You're getting so good at this!,أَنْتَ تَتَحَسَّنُ كَثيراً!
+unit_done,Milo — greetings & celebration,"warm, smiling, unhurried; celebrate gently (never shout)",You finished the whole unit! Amazing!,أَنْهَيْتَ الوَحْدَةَ كامِلَةً! مُذْهِلٌ!
+path_intro,Milo — greetings & celebration,"warm, smiling, unhurried; celebrate gently (never shout)",This is our learning path! Tap the glowing circle!,هٰذا مَسارُ التَّعَلُّمِ! اِضْغَطْ عَلَى الدّائِرَةِ المُضيئَةِ!
+rooms_intro,Milo — greetings & celebration,"warm, smiling, unhurried; celebrate gently (never shout)",Choose a room to play in!,اِخْتَرْ غُرْفَةً لِتَلْعَبَ فيها!
+session_over,Session & bedtime — calm and slow,"soft, slow, sleepy warmth",Play time is over for now. See you soon!,اِنْتَهَى وَقْتُ اللَّعِبِ الآنَ. إِلَى اللِّقاءِ قَريباً!
+good_night,Session & bedtime — calm and slow,"soft, slow, sleepy warmth",Good night! Sleep tight!,تُصْبِحُ عَلَى خَيْرٍ! نَوْماً هَنيئاً!
+bedtime_intro,Session & bedtime — calm and slow,"soft, slow, sleepy warmth",It's almost bedtime. Let's get ready!,اِقْتَرَبَ وَقْتُ النَّوْمِ. هَيَّا نَسْتَعِدُّ!
+bedtime_toys,Session & bedtime — calm and slow,"soft, slow, sleepy warmth",Put the toy in the basket!,ضَعِ اللُّعْبَةَ في السَّلَّةِ!
+bedtime_teeth,Session & bedtime — calm and slow,"soft, slow, sleepy warmth",Let's brush my teeth!,هَيَّا نُنَظِّفُ أَسْناني!
+bedtime_pajamas,Session & bedtime — calm and slow,"soft, slow, sleepy warmth",Help me put on my pajamas!,ساعِدْني في اِرْتِداءِ البيجاما!
+bedtime_teddy,Session & bedtime — calm and slow,"soft, slow, sleepy warmth",Put the teddy bear in the bed!,ضَعِ الدُّبْدُوبَ في السَّريرِ!
+bedtime_light,Session & bedtime — calm and slow,"soft, slow, sleepy warmth",Turn off the light!,أَطْفِئِ النُّورَ!
+bedtime_done,Session & bedtime — calm and slow,"soft, slow, sleepy warmth",Good night! Sweet dreams!,تُصْبِحُ عَلَى خَيْرٍ! أَحْلاماً سَعيدَةً!
+feed_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",The animals are hungry! Let's feed them!,الحَيَواناتُ جائِعَةٌ! هَيَّا نُطْعِمُها!
+feed_rabbit,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Give the carrot to the bunny!,أَعْطِ الجَزَرَةَ لِلأَرْنَبِ!
+feed_cow,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Give the grass to the cow!,أَعْطِ العُشْبَ لِلْبَقَرَةِ!
+feed_monkey,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Give the banana to the monkey!,أَعْطِ المَوْزَةَ لِلْقِرْدِ!
+bubble_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Look at all the bubbles!,اُنْظُرْ إِلَى كُلِّ هٰذِهِ الفُقَّاعاتِ!
+pop_blue,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Pop the blue bubble!,اِضْغَطْ عَلَى الفُقَّاعَةِ الزَّرْقاءِ!
+pop_yellow,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Pop the yellow bubble!,اِضْغَطْ عَلَى الفُقَّاعَةِ الصَّفْراءِ!
+pop_red,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Pop the red bubble!,اِضْغَطْ عَلَى الفُقَّاعَةِ الحَمْراءِ!
+pop_green,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Pop the green bubble!,اِضْغَطْ عَلَى الفُقَّاعَةِ الخَضْراءِ!
+pop_fish,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Pop the bubble with the fish!,اِضْغَطْ عَلَى فُقَّاعَةِ السَّمَكَةِ!
+pop_star,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Pop the bubble with the star!,اِضْغَطْ عَلَى فُقَّاعَةِ النَّجْمَةِ!
+pop_heart,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Pop the bubble with the heart!,اِضْغَطْ عَلَى فُقَّاعَةِ القَلْبِ!
+pop_then_next,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Now the next one!,وَالآنَ التّالِيَةُ!
+socks_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",The socks lost their friends!,الجَوارِبُ أَضاعَتْ أَصْدِقاءَها!
+socks_find,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Find the matching sock!,جِدِ الجَوْرَبَ المُطابِقَ!
+pig_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses","Oh no, the pig is all muddy! Let's wash it!",يا إِلٰهي، الخِنْزيرُ مَلِيءٌ بِالطِّينِ! هَيَّا نَغْسِلُهُ!
+pig_scrub,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Rub the sponge on the mud!,اُفْرُكِ الإِسْفَنْجَةَ عَلَى الطِّينِ!
+pig_rinse,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Tap the water to rinse!,اِضْغَطْ عَلَى الماءِ لِلشَّطْفِ!
+pig_dry,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Dry the pig with the towel!,جَفِّفِ الخِنْزيرَ بِالمِنْشَفَةِ!
+pig_clean,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",So clean! What a happy pig!,نَظيفٌ تَماماً! يا لَهُ مِنْ خِنْزيرٍ سَعيدٍ!
+rocket_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Let's build a rocket!,هَيَّا نَبْني صارُوخاً!
+rocket_piece,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Put the piece on its shadow!,ضَعِ القِطْعَةَ عَلَى ظِلِّها!
+rocket_launch,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses","Three, two, one, up we go!",ثَلاثَةٌ، اِثْنانِ، واحِدٌ، اِنْطَلِقْ!
+find_it,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Can you find it? Tap it!,هَلْ تَجِدُهُ؟ اِضْغَطْ عَلَيْهِ!
+sort_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Let's tidy up! Put each one in its basket!,هَيَّا نُرَتِّبُ! ضَعْ كُلَّ واحِدَةٍ في سَلَّتِها!
+sort_next,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Wonderful! What about this one?,رائِعٌ! وَماذا عَنْ هٰذِهِ؟
+shadow_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Every friend has a shadow! Match them!,لِكُلِّ صَديقٍ ظِلٌّ! طابِقْ بَيْنَهُما!
+shadow_next,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Yes! Find the next shadow!,نَعَمْ! جِدِ الظِّلَّ التّالي!
+memory_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Flip the cards and find the pairs!,اِقْلِبِ البِطاقاتِ وَجِدِ الأَزْواجَ!
+memory_pair_found,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",A pair! You found it!,زَوْجٌ مُتَطابِقٌ! لَقَدْ وَجَدْتَهُ!
+pattern_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Look at the pattern!,اُنْظُرْ إِلَى النَّمَطِ!
+pattern_next,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",What comes next?,ماذا يَأْتي بَعْدَ ذٰلِكَ؟
+count_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Let's count together!,هَيَّا نَعُدُّ مَعاً!
+give_me,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Can you give me...,هَلْ تُعْطيني...
+trace_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Let's draw with your finger!,هَيَّا نَرْسُمُ بِإِصْبَعِكَ!
+trace_follow,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Follow the line from the dot!,اِتْبَعِ الخَطَّ مِنَ النُّقْطَةِ!
+paint_intro,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",Let's paint! Use your finger!,هَيَّا نَرْسُمُ! اِسْتَخْدِمْ إِصْبَعَكَ!
+paint_done,Game instructions,"clear, warm, a touch of playful invitation; pause slightly between clauses",What a beautiful picture!,يا لَها مِنْ لَوْحَةٍ جَميلَةٍ!
+count_one,"Numbers (counting voice — bright, rhythmic)","bright and rhythmic, as if counting on fingers",One!,واحِدٌ!
+count_two,"Numbers (counting voice — bright, rhythmic)","bright and rhythmic, as if counting on fingers",Two!,اِثْنانِ!
+count_three,"Numbers (counting voice — bright, rhythmic)","bright and rhythmic, as if counting on fingers",Three!,ثَلاثَةٌ!
+count_four,"Numbers (counting voice — bright, rhythmic)","bright and rhythmic, as if counting on fingers",Four!,أَرْبَعَةٌ!
+count_five,"Numbers (counting voice — bright, rhythmic)","bright and rhythmic, as if counting on fingers",Five!,خَمْسَةٌ!
+count_six,"Numbers (counting voice — bright, rhythmic)","bright and rhythmic, as if counting on fingers",Six!,سِتَّةٌ!
+count_seven,"Numbers (counting voice — bright, rhythmic)","bright and rhythmic, as if counting on fingers",Seven!,سَبْعَةٌ!
+count_eight,"Numbers (counting voice — bright, rhythmic)","bright and rhythmic, as if counting on fingers",Eight!,ثَمانِيَةٌ!
+count_nine,"Numbers (counting voice — bright, rhythmic)","bright and rhythmic, as if counting on fingers",Nine!,تِسْعَةٌ!
+count_ten,"Numbers (counting voice — bright, rhythmic)","bright and rhythmic, as if counting on fingers",Ten!,عَشَرَةٌ!
+color_red,Colors,"single joyful word, consistent energy across all",Red!,أَحْمَرُ!
+color_blue,Colors,"single joyful word, consistent energy across all",Blue!,أَزْرَقُ!
+color_yellow,Colors,"single joyful word, consistent energy across all",Yellow!,أَصْفَرُ!
+color_green,Colors,"single joyful word, consistent energy across all",Green!,أَخْضَرُ!
+color_orange,Colors,"single joyful word, consistent energy across all",Orange!,بُرْتُقالِيٌّ!
+color_purple,Colors,"single joyful word, consistent energy across all",Purple!,بَنَفْسَجِيٌّ!
+color_pink,Colors,"single joyful word, consistent energy across all",Pink!,وَرْدِيٌّ!
+shape_circle,Shapes,single clear word,A circle!,دائِرَةٌ!
+shape_square,Shapes,single clear word,A square!,مُرَبَّعٌ!
+shape_triangle,Shapes,single clear word,A triangle!,مُثَلَّثٌ!
+shape_star,Shapes,single clear word,A star!,نَجْمَةٌ!
+shape_heart,Shapes,single clear word,A heart!,قَلْبٌ!
+shape_rectangle,Shapes,single clear word,A rectangle!,مُسْتَطيلٌ!
+shape_oval,Shapes,single clear word,An oval!,شَكْلٌ بَيْضاوِيٌّ!
+shape_diamond,Shapes,single clear word,A diamond!,مُعَيَّنٌ!
+name_rabbit,Animal & food names,"bright, affectionate",The bunny!,الأَرْنَبُ!
+name_cow,Animal & food names,"bright, affectionate",The cow!,البَقَرَةُ!
+name_monkey,Animal & food names,"bright, affectionate",The monkey!,القِرْدُ!
+name_duck,Animal & food names,"bright, affectionate",The duck!,البَطَّةُ!
+name_fish,Animal & food names,"bright, affectionate",The fish!,السَّمَكَةُ!
+name_cat,Animal & food names,"bright, affectionate",The cat!,القِطَّةُ!
+name_dog,Animal & food names,"bright, affectionate",The dog!,الكَلْبُ!
+name_bee,Animal & food names,"bright, affectionate",The bee!,النَّحْلَةُ!
+name_butterfly,Animal & food names,"bright, affectionate",The butterfly!,الفَراشَةُ!
+name_ladybug,Animal & food names,"bright, affectionate",The ladybug!,الدُّعْسُوقَةُ!
+name_apple,Animal & food names,"bright, affectionate",The apple!,التُّفّاحَةُ!
+name_banana,Animal & food names,"bright, affectionate",The banana!,المَوْزَةُ!
+name_strawberry,Animal & food names,"bright, affectionate",The strawberry!,الفَراوِلَةُ!
+name_orange,Animal & food names,"bright, affectionate",The orange!,البُرْتُقالَةُ!
+name_pear,Animal & food names,"bright, affectionate",The pear!,الكُمَّثْرَى!
+name_grapes,Animal & food names,"bright, affectionate",The grapes!,العِنَبُ!
+name_bread,Animal & food names,"bright, affectionate",The bread!,الخُبْزُ!
+name_milk,Animal & food names,"bright, affectionate",The milk!,الحَليبُ!
+name_cheese,Animal & food names,"bright, affectionate",The cheese!,الجُبْنُ!
+name_egg,Animal & food names,"bright, affectionate",The egg!,البَيْضَةُ!
+name_carrot,Animal & food names,"bright, affectionate",The carrot!,الجَزَرَةُ!
+name_cookie,Animal & food names,"bright, affectionate",The cookie!,البَسْكَويتَةُ!
+letter_a,English letters (English narrator only),"letter name, clear and friendly",A!,
+letter_b,English letters (English narrator only),"letter name, clear and friendly",B!,
+letter_c,English letters (English narrator only),"letter name, clear and friendly",C!,
+letter_d,English letters (English narrator only),"letter name, clear and friendly",D!,
+letter_e,English letters (English narrator only),"letter name, clear and friendly",E!,
+letter_f,English letters (English narrator only),"letter name, clear and friendly",F!,
+letter_g,English letters (English narrator only),"letter name, clear and friendly",G!,
+letter_h,English letters (English narrator only),"letter name, clear and friendly",H!,
+letter_i,English letters (English narrator only),"letter name, clear and friendly",I!,
+letter_j,English letters (English narrator only),"letter name, clear and friendly",J!,
+letter_k,English letters (English narrator only),"letter name, clear and friendly",K!,
+letter_l,English letters (English narrator only),"letter name, clear and friendly",L!,
+letter_m,English letters (English narrator only),"letter name, clear and friendly",M!,
+letter_n,English letters (English narrator only),"letter name, clear and friendly",N!,
+letter_o,English letters (English narrator only),"letter name, clear and friendly",O!,
+letter_p,English letters (English narrator only),"letter name, clear and friendly",P!,
+letter_q,English letters (English narrator only),"letter name, clear and friendly",Q!,
+letter_r,English letters (English narrator only),"letter name, clear and friendly",R!,
+letter_s,English letters (English narrator only),"letter name, clear and friendly",S!,
+letter_t,English letters (English narrator only),"letter name, clear and friendly",T!,
+letter_u,English letters (English narrator only),"letter name, clear and friendly",U!,
+letter_v,English letters (English narrator only),"letter name, clear and friendly",V!,
+letter_w,English letters (English narrator only),"letter name, clear and friendly",W!,
+letter_x,English letters (English narrator only),"letter name, clear and friendly",X!,
+letter_y,English letters (English narrator only),"letter name, clear and friendly",Y!,
+letter_z,English letters (English narrator only),"letter name, clear and friendly",Z!,
+ar_alif,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,أَلِفْ!
+ar_ba,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,باءْ!
+ar_ta,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,تاءْ!
+ar_tha,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,ثاءْ!
+ar_jim,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,جيمْ!
+ar_hha,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,حاءْ!
+ar_kha,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,خاءْ!
+ar_dal,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,دالْ!
+ar_dhal,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,ذالْ!
+ar_ra,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,راءْ!
+ar_zay,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,زايْ!
+ar_sin,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,سينْ!
+ar_shin,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,شينْ!
+ar_sad,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,صادْ!
+ar_dad,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,ضادْ!
+ar_tta,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,طاءْ!
+ar_zza,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,ظاءْ!
+ar_ain,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,عَيْنْ!
+ar_ghain,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,غَيْنْ!
+ar_fa,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,فاءْ!
+ar_qaf,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,قافْ!
+ar_kaf,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,كافْ!
+ar_lam,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,لامْ!
+ar_mim,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,ميمْ!
+ar_nun,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,نونْ!
+ar_ha,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,هاءْ!
+ar_waw,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,واوْ!
+ar_ya,Arabic letters (Arabic narrator only),"letter name, clear and friendly / اسم الحرف بوضوح ولطف",,ياءْ!
