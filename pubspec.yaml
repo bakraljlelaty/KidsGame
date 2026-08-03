@@ -37,6 +37,9 @@ flutter:
     - assets/audio/voices/en/
     - assets/audio/voices/ar/
     - assets/config/
+    - assets/images/items/
+    - assets/images/milo/
+    - assets/images/scenes/
 
   fonts:
     - family: Baloo

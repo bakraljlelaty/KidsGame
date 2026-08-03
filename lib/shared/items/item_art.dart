@@ -4,6 +4,7 @@ import 'package:flutter/painting.dart';
 
 import '../../content/items/content_item.dart';
 import '../../core/theme/palette.dart';
+import 'game_images.dart';
 
 /// Draws every ContentItem procedurally (original placeholder art). One
 /// switch on artId keeps all item drawing swappable for sprites later.
@@ -20,6 +21,14 @@ class ItemArt {
     ContentItem item, {
     bool highContrast = false,
   }) {
+    // Illustrated art takes over when the generated/commissioned image
+    // exists; everything below stays as the universal fallback.
+    final image = GameImages.item(item.artId);
+    if (image != null) {
+      GameImages.drawContain(image, canvas, size);
+      return;
+    }
+
     canvas.save();
     final scale = math.min(size.width / 100, size.height / 100);
     canvas.translate(

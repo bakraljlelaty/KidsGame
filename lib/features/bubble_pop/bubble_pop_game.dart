@@ -11,6 +11,7 @@ import '../../shared/components/gentle_effects.dart';
 import '../../shared/components/tap_target.dart';
 import '../../shared/game/toddler_game.dart';
 import 'bubble_art.dart';
+import '../../shared/items/game_images.dart';
 
 /// Mini-game 2: Bubble Pop.
 ///
@@ -643,6 +644,11 @@ class _UnderwaterBackground extends PositionComponent {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
+    final sceneImage = GameImages.scene('scene_underwater');
+    if (sceneImage != null) {
+      GameImages.drawCover(sceneImage, canvas, Size(size.x, size.y));
+      return;
+    }
     BubbleArt.paintUnderwater(canvas, size, _time);
   }
 }

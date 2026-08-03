@@ -1,8 +1,10 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
 import '../../core/theme/palette.dart';
+import '../items/game_images.dart';
 import 'milo_state.dart';
 
 /// Procedural placeholder art for Milo — an original, small, round, friendly
@@ -23,6 +25,20 @@ class MiloPainter {
     bool wearsHelmet = false,
     int pointDirection = 1,
   }) {
+    // Illustrated Milo: static pose art per state, animated in code
+    // (bounce, sway, mirror, squash) so the character still feels alive.
+    final image =
+        GameImages.milo(state.name) ?? GameImages.milo(MiloState.idle.name);
+    if (image != null) {
+      _paintImage(canvas, size, image,
+          state: state,
+          time: time,
+          reducedMotion: reducedMotion,
+          wearsHelmet: wearsHelmet,
+          pointDirection: pointDirection);
+      return;
+    }
+
     canvas.save();
     final scale = math.min(size.width / 100, size.height / 120);
     canvas.translate(
@@ -172,6 +188,90 @@ class MiloPainter {
     }
 
     canvas.restore();
+  }
+
+  /// Renders the illustrated pose with code-driven life: bounce, sway,
+  /// dance tilt, talking squash, sleepy Zs and the helmet overlay.
+  static void _paintImage(
+    Canvas canvas,
+    Size size,
+    ui.Image image, {
+    required MiloState state,
+    required double time,
+    required bool reducedMotion,
+    required bool wearsHelmet,
+    required int pointDirection,
+  }) {
+    final motion = reducedMotion ? 0.25 : 1.0;
+    final t = time;
+    double bounce = math.sin(t * 2 * math.pi / 1.8) * 2.5 * motion;
+    double sway = 0;
+    double rotation = 0;
+    double squashY = 0;
+    switch (state) {
+      case MiloState.dancing:
+        bounce = math.sin(t * 2 * math.pi / 0.55) * 6 * motion;
+        sway = math.sin(t * 2 * math.pi / 1.1) * 8 * motion;
+        rotation = math.sin(t * 2 * math.pi / 1.1) * 0.09 * motion;
+      case MiloState.happy:
+      case MiloState.laughing:
+        bounce = math.sin(t * 2 * math.pi / 0.8) * 5 * motion;
+      case MiloState.talking:
+        squashY = math.sin(t * 2 * math.pi / 0.32) * 0.015 * motion;
+      case MiloState.sleepy:
+        bounce = math.sin(t * 2 * math.pi / 3.4) * 1.5 * motion;
+      default:
+        break;
+    }
+
+    canvas.save();
+    canvas.translate(size.width / 2 + sway, size.height / 2 + bounce);
+    if (state == MiloState.pointing && pointDirection < 0) {
+      canvas.scale(-1, 1);
+    }
+    canvas.rotate(rotation);
+    canvas.scale(1, 1 + squashY);
+    canvas.translate(-size.width / 2, -size.height / 2);
+    GameImages.drawContain(image, canvas, size);
+    canvas.restore();
+
+    if (wearsHelmet) {
+      final center = Offset(size.width / 2, size.height * 0.36);
+      final radius = size.width * 0.36;
+      canvas.drawCircle(
+          center, radius, Paint()..color = Palette.babyBlue.withValues(alpha: 0.3));
+      canvas.drawCircle(
+        center,
+        radius,
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.8)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = size.width * 0.03,
+      );
+    }
+
+    if (state == MiloState.sleepy) {
+      final zPaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = size.width * 0.024
+        ..strokeCap = StrokeCap.round;
+      for (var i = 0; i < 2; i++) {
+        final phase = (t / 2.4 + i * 0.5) % 1.0;
+        final zx = size.width * (0.74 + i * 0.08);
+        final zy = size.height * 0.3 - phase * size.height * 0.18;
+        final zSize = size.width * (0.05 + i * 0.02);
+        final zPath = Path()
+          ..moveTo(zx - zSize / 2, zy - zSize / 2)
+          ..lineTo(zx + zSize / 2, zy - zSize / 2)
+          ..lineTo(zx - zSize / 2, zy + zSize / 2)
+          ..lineTo(zx + zSize / 2, zy + zSize / 2);
+        canvas.drawPath(
+          zPath,
+          zPaint
+            ..color = Palette.textSoft.withValues(alpha: 0.7 * (1 - phase)),
+        );
+      }
+    }
   }
 
   static void _paintArms(

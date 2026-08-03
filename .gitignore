@@ -44,3 +44,4 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 tool/piper_models/
+.art_raw/

@@ -11,6 +11,7 @@ import '../../shared/components/drop_zone.dart';
 import '../../shared/components/gentle_effects.dart';
 import '../../shared/game/toddler_game.dart';
 import 'animal_art.dart';
+import '../../shared/items/game_images.dart';
 
 /// Mini-game 1: Feed the Animals.
 ///
@@ -224,6 +225,11 @@ class _FarmBackground extends PositionComponent {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
+    final sceneImage = GameImages.scene('scene_farm');
+    if (sceneImage != null) {
+      GameImages.drawCover(sceneImage, canvas, Size(size.x, size.y));
+      return;
+    }
     final w = size.x;
     final h = size.y;
 

@@ -11,6 +11,7 @@ import '../../../core/theme/palette.dart';
 import '../../../shared/components/gentle_effects.dart';
 import '../../../shared/components/tap_target.dart';
 import '../../../shared/game/toddler_game.dart';
+import '../../../shared/items/game_images.dart';
 import '../../../shared/items/item_art.dart';
 
 /// REFERENCE ENGINE — TapChoice.
@@ -344,6 +345,11 @@ class _SoftBackground extends PositionComponent {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
+    final sceneImage = GameImages.scene('scene_activity');
+    if (sceneImage != null) {
+      GameImages.drawCover(sceneImage, canvas, Size(size.x, size.y));
+      return;
+    }
     final rect = Rect.fromLTWH(0, 0, size.x, size.y);
     canvas.drawRect(
       rect,

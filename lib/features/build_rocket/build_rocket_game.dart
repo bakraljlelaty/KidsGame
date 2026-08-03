@@ -12,6 +12,7 @@ import '../../shared/components/drop_zone.dart';
 import '../../shared/components/gentle_effects.dart';
 import '../../shared/game/toddler_game.dart';
 import 'rocket_art.dart';
+import '../../shared/items/game_images.dart';
 
 /// Mini-game: Build the Rocket.
 ///
@@ -498,6 +499,11 @@ class _WorkshopBackground extends PositionComponent {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
+    final sceneImage = GameImages.scene('scene_workshop');
+    if (sceneImage != null) {
+      GameImages.drawCover(sceneImage, canvas, Size(size.x, size.y));
+      return;
+    }
     WorkshopArt.paintWorkshop(
       canvas,
       size,

@@ -14,6 +14,7 @@ import '../../shared/components/swipe_clean_layer.dart';
 import '../../shared/components/tap_target.dart';
 import '../../shared/game/toddler_game.dart';
 import 'pig_art.dart';
+import '../../shared/items/game_images.dart';
 
 /// Mini-game: Muddy Pig Bath.
 ///
@@ -663,6 +664,11 @@ class _BathBackground extends PositionComponent {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
+    final sceneImage = GameImages.scene('scene_bath');
+    if (sceneImage != null) {
+      GameImages.drawCover(sceneImage, canvas, Size(size.x, size.y));
+      return;
+    }
     final w = size.x;
     final h = size.y;
 

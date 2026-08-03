@@ -15,6 +15,6 @@ Future<void> main() async {
   ]);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-  final services = await AppServices.bootstrap();
+  final services = await AppServices.bootstrap(loadImages: true);
   runApp(LittleWonderApp(services: services));
 }

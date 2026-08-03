@@ -14,6 +14,7 @@ import '../../shared/components/gentle_effects.dart';
 import '../../shared/components/tap_target.dart';
 import '../../shared/game/toddler_game.dart';
 import 'bedtime_art.dart';
+import '../../shared/items/game_images.dart';
 
 /// Mini-game: Bedtime Routine.
 ///
@@ -624,6 +625,11 @@ class _BedroomBackground extends PositionComponent {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
+    final sceneImage = GameImages.scene('scene_night');
+    if (sceneImage != null) {
+      GameImages.drawCover(sceneImage, canvas, Size(size.x, size.y));
+      return;
+    }
     BedtimeArt.paintRoom(
       canvas,
       size,

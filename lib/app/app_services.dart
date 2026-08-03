@@ -15,6 +15,7 @@ import '../features/settings/app_settings.dart';
 import '../features/settings/settings_controller.dart';
 import '../features/sticker_book/sticker_book_controller.dart';
 import '../features/sticker_book/sticker_placements.dart';
+import '../shared/items/game_images.dart';
 
 /// Builds and owns every service and controller. One instance per app run;
 /// tests construct it with an [InMemoryStore].
@@ -48,8 +49,13 @@ class AppServices {
     DateTime Function()? clock,
     bool enableAutoTick = true,
     bool initAudio = true,
+    bool loadImages = false,
   }) async {
     final localStore = store ?? await SharedPreferencesStore.open();
+
+    if (loadImages) {
+      await GameImages.load();
+    }
 
     final audio = AudioManager();
     final settings = SettingsController(SettingsRepository(localStore));

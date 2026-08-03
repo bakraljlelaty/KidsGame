@@ -7,6 +7,7 @@ import '../../core/theme/palette.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/sticker_art.dart';
 import '../rewards/rewards_controller.dart';
+import '../../shared/items/game_images.dart';
 import '../rewards/sticker_catalog.dart';
 import 'sticker_book_controller.dart';
 
@@ -320,6 +321,11 @@ class _ScenePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    final sceneImage = GameImages.scene('sticker_$sceneId');
+    if (sceneImage != null) {
+      GameImages.drawCover(sceneImage, canvas, size);
+      return;
+    }
     final rect = Offset.zero & size;
     switch (sceneId) {
       case 'sky':

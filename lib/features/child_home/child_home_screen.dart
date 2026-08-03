@@ -8,6 +8,7 @@ import '../../core/navigation/app_navigation.dart';
 import '../../core/theme/palette.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/characters/milo_state.dart';
+import '../../shared/items/game_images.dart';
 import '../../shared/characters/milo_view.dart';
 import '../../shared/widgets/big_round_button.dart';
 import '../learning_path/learning_path_screen.dart';
@@ -296,6 +297,16 @@ class _MeadowPainter extends CustomPainter {
     final h = size.height;
     final tau = t * 2 * 3.14159265;
 
+    // Illustrated meadow: the scene image carries the scenery; only the
+    // living touches (clouds, butterfly) stay procedural on top.
+    final sceneImage = GameImages.scene('home_meadow');
+    if (sceneImage != null) {
+      GameImages.drawCover(sceneImage, canvas, size);
+      _clouds(canvas, size);
+      _butterfly(canvas, size, tau);
+      return;
+    }
+
     // Sun with breathing halo and soft rays.
     final sun = Offset(w * 0.86, h * 0.16);
     final halo = 58 + 6 * _wave(tau, 3);
@@ -322,31 +333,7 @@ class _MeadowPainter extends CustomPainter {
         sun.translate(-12, -12), 14,
         Paint()..color = Colors.white.withValues(alpha: 0.4));
 
-    // Drifting clouds (two layers, wrapping).
-    void cloud(double phase, double y, double scale, double alpha) {
-      final x = ((t * 0.6 + phase) % 1.2 - 0.1) * w;
-      final c = Offset(x, h * y);
-      final paint = Paint()..color = Colors.white.withValues(alpha: alpha);
-      canvas.drawOval(
-          Rect.fromCenter(center: c, width: 130 * scale, height: 48 * scale),
-          paint);
-      canvas.drawOval(
-          Rect.fromCenter(
-              center: c.translate(-42 * scale, 12 * scale),
-              width: 90 * scale,
-              height: 40 * scale),
-          paint);
-      canvas.drawOval(
-          Rect.fromCenter(
-              center: c.translate(44 * scale, 14 * scale),
-              width: 90 * scale,
-              height: 42 * scale),
-          paint);
-    }
-
-    cloud(0.0, 0.14, 1.0, 0.9);
-    cloud(0.45, 0.26, 0.7, 0.75);
-    cloud(0.8, 0.08, 0.55, 0.6);
+    _clouds(canvas, size);
 
     // Layered hills.
     canvas.drawOval(
@@ -387,7 +374,41 @@ class _MeadowPainter extends CustomPainter {
           Paint()..color = Palette.butter);
     }
 
-    // A wandering butterfly on a lazy figure-eight.
+    _butterfly(canvas, size, tau);
+  }
+
+  void _clouds(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    void cloud(double phase, double y, double scale, double alpha) {
+      final x = ((t * 0.6 + phase) % 1.2 - 0.1) * w;
+      final c = Offset(x, h * y);
+      final paint = Paint()..color = Colors.white.withValues(alpha: alpha);
+      canvas.drawOval(
+          Rect.fromCenter(center: c, width: 130 * scale, height: 48 * scale),
+          paint);
+      canvas.drawOval(
+          Rect.fromCenter(
+              center: c.translate(-42 * scale, 12 * scale),
+              width: 90 * scale,
+              height: 40 * scale),
+          paint);
+      canvas.drawOval(
+          Rect.fromCenter(
+              center: c.translate(44 * scale, 14 * scale),
+              width: 90 * scale,
+              height: 42 * scale),
+          paint);
+    }
+
+    cloud(0.0, 0.14, 1.0, 0.9);
+    cloud(0.45, 0.26, 0.7, 0.75);
+    cloud(0.8, 0.08, 0.55, 0.6);
+  }
+
+  void _butterfly(Canvas canvas, Size size, double tau) {
+    final w = size.width;
+    final h = size.height;
     final bx = w * (0.32 + 0.2 * _sinA(tau));
     final by = h * (0.3 + 0.1 * _sinA(2 * tau));
     final flap = _wave(tau * 30, 1).abs();
